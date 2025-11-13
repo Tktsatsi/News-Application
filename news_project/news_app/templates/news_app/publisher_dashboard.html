@@ -1,0 +1,146 @@
+{% extends 'news_app/base.html' %}
+
+{% block title %}{{ publisher.name }} - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>{{ publisher.name }} Dashboard</h2>
+    
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+    <!-- Publisher Info -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Publisher Information</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Description:</strong> {{ publisher.description|default:"No description" }}</p>
+            <p><strong>Website:</strong> 
+                {% if publisher.website %}
+                    <a href="{{ publisher.website }}" target="_blank">{{ publisher.website }}</a>
+                {% else %}
+                    N/A
+                {% endif %}
+            </p>
+            <p><strong>Established:</strong> {{ publisher.established_date|date:"Y"|default:"N/A" }}</p>
+        </div>
+    </div>
+    
+    <!-- Join Requests -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h4>Pending Join Requests ({{ pending_requests.count }})</h4>
+        </div>
+        <div class="card-body">
+            {% if pending_requests %}
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Role</th>
+                            <th>Message</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in pending_requests %}
+                        <tr>
+                            <td>{{ request.user.username }}</td>
+                            <td>{{ request.user.get_role_display }}</td>
+                            <td>{{ request.message|default:"No message" }}</td>
+                            <td>{{ request.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                <a href="{% url 'approve_join_request' request.pk %}" 
+                                   class="btn btn-sm btn-success">
+                                    Approve
+                                </a>
+                                <a href="{% url 'reject_join_request' request.pk %}" 
+                                   class="btn btn-sm btn-danger">
+                                    Reject
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No pending join requests.</p>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Team Members -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Editors ({{ editors.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if editors %}
+                    <ul class="list-group">
+                        {% for editor in editors %}
+                        <li class="list-group-item">{{ editor.username }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">No editors</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Journalists ({{ journalists.count }})</h5>
+                </div>
+                <div class="card-body">
+                    {% if journalists %}
+                    <ul class="list-group">
+                        {% for journalist in journalists %}
+                        <li class="list-group-item">{{ journalist.username }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% else %}
+                    <p class="text-muted">No journalists</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Articles -->
+    <div class="card">
+        <div class="card-header">
+            <h5>Recent Articles</h5>
+        </div>
+        <div class="card-body">
+            {% if articles %}
+            <ul class="list-group">
+                {% for article in articles %}
+                <li class="list-group-item">
+                    <a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a>
+                    <span class="badge bg-{{ article.is_approved|yesno:'success,warning' }}">
+                        {{ article.is_approved|yesno:'Approved,Pending' }}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted">No articles yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

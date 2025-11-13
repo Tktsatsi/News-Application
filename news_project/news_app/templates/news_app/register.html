@@ -1,0 +1,167 @@
+{% extends "news_app/base.html" %}
+
+{% block title %}Register - News Application{% endblock %}
+
+{% block extra_css %}
+<style>
+    .register-form {
+        max-width: 300px;
+        margin: 0 auto;
+    }
+
+    .register-form h2 {
+        text-align: center;
+        margin-bottom: 25px;
+        color: #333;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: #444;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 15px;
+    }
+
+    .user-type-group {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .user-type-option input[type="radio"] {
+        display: none;
+    }
+
+    .user-type-option label {
+        display: block;
+        text-align: center;
+        padding: 12px;
+        border: 2px solid #ccc;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .user-type-option input[type="radio"]:checked + label {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border-color: #667eea;
+    }
+
+    .register-form button {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        border: none;
+        border-radius: 8px;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+        transition: transform 0.2s;
+    }
+
+    .register-form button:hover {
+        transform: translateY(-2px);
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .login-link a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+    }
+
+    .login-link a:hover {
+        text-decoration: underline;
+    }
+
+    .errorlist {
+        list-style: none;
+        color: #e74c3c;
+        font-size: 14px;
+        padding-left: 0;
+        margin-top: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="register-form">
+        <h2>Create Account</h2>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="{{ form.username.id_for_label }}">Username</label>
+                {{ form.username }}
+                {{ form.username.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email</label>
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password1.id_for_label }}">Password</label>
+                {{ form.password1 }}
+                {{ form.password1.errors }}
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.password2.id_for_label }}">Confirm Password</label>
+                {{ form.password2 }}
+                {{ form.password2.errors }}
+            </div>
+
+            <div class="form-group">
+                <label>Register as:</label>
+                <div class="user-type-group">
+                    <div class="user-type-option">
+                        <input type="radio" name="role" value="reader" id="id_role_reader" required>
+                        <label for="id_role_reader">Reader</label>
+                    </div>
+                    <div class="user-type-option">
+                        <input type="radio" name="role" value="journalist" id="id_role_journalist" required>
+                        <label for="id_role_journalist">Journalist</label>
+                    </div>
+                    <div class="user-type-option">
+                        <input type="radio" name="role" value="editor" id="id_role_editor" required>
+                        <label for="id_role_editor">Editor</label>
+                    </div>
+                    <div class="user-type-option">
+                        <input type="radio" name="role" value="publisher" id="id_role_publisher" required>
+                        <label for="id_role_publisher">Publisher</label>
+                    </div>
+                </div>
+                {{ form.role.errors }}
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <div class="login-link">
+            Already have an account? <a href="{% url 'login' %}">Login here</a>
+        </div>
+    </div>
+{% endblock %}

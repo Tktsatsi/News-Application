@@ -1,0 +1,85 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ newsletter.title }} - News App{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Back button -->
+            <div class="mb-3">
+                <a href="{% url 'newsletter_list' %}" class="btn btn-sm btn-outline-secondary">
+                    ← Back to Newsletters
+                </a>
+            </div>
+            
+            <!-- Newsletter content -->
+            <article class="card shadow-sm">
+                <div class="card-body">
+                    <h1 class="card-title mb-3">{{ newsletter.title }}</h1>
+                    
+                    <!-- Meta information -->
+                    <div class="text-muted mb-4 border-bottom pb-3">
+                        <small>
+                            By <strong>{{ newsletter.author.username }}</strong>
+                            
+                            {% if newsletter.publisher %}
+                            | {{ newsletter.publisher.name }}
+                            {% endif %}
+                            
+                            | {{ newsletter.published_date|date:"F d, Y" }}
+                        </small>
+                    </div>
+                    
+                    <!-- Newsletter content -->
+                    <div class="newsletter-content">
+                        {{ newsletter.content|linebreaks }}
+                    </div>
+                </div>
+                
+                <!-- Action buttons for author -->
+                {% if user == newsletter.author %}
+                <div class="card-footer bg-transparent">
+                    <div class="btn-group" role="group">
+                        <a href="{% url 'edit_newsletter' newsletter.pk %}" class="btn btn-outline-primary">
+                            Edit
+                        </a>
+                        <a href="{% url 'delete_newsletter' newsletter.pk %}" class="btn btn-outline-danger">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </article>
+            
+            <!-- Related newsletters by same author -->
+            {% if related_newsletters %}
+            <div class="mt-5">
+                <h4>More from {{ newsletter.author.username }}</h4>
+                <div class="list-group">
+                    {% for related in related_newsletters %}
+                    <a href="{% url 'newsletter_detail' related.pk %}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1">{{ related.title }}</h6>
+                            <small>{{ related.published_date|date:"M d" }}</small>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.newsletter-content {
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+.newsletter-content p {
+    margin-bottom: 1.5rem;
+}
+</style>
+{% endblock %}

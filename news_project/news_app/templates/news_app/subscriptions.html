@@ -1,0 +1,87 @@
+{% extends "news_app/base.html" %}
+
+{% block title %}Manage Subscriptions - News Application{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="header">
+            <a href="{% url 'home' %}" class="back-link">← Back to Home</a>
+            <h1>Manage Subscriptions</h1>
+            <p>Subscribe to publishers and journalists to get their content in your feed</p>
+        </div>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="messages">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <!-- Publishers Section -->
+        <div class="section">
+            <h2>Publishers</h2>
+            {% if publishers %}
+                <div class="items-grid">
+                    {% for publisher in publishers %}
+                        <div class="item-card {% if publisher in subscribed_publishers %}subscribed{% endif %}">
+                            <div class="item-name">
+                                {{ publisher.name }}
+                                {% if publisher in subscribed_publishers %}
+                                    <span class="badge">Subscribed</span>
+                                {% endif %}
+                            </div>
+                            <div class="item-description">
+                                {{ publisher.description|truncatewords:20|default:"No description available" }}
+                            </div>
+                            <div class="item-meta">
+                                {% if publisher.website %}
+                                    Website: <a href="{{ publisher.website }}" target="_blank">{{ publisher.website }}</a>
+                                {% endif %}
+                            </div>
+                            {% if publisher in subscribed_publishers %}
+                                <a href="{% url 'unsubscribe_publisher' publisher.pk %}" class="btn btn-unsubscribe">Unsubscribe</a>
+                            {% else %}
+                                <a href="{% url 'subscribe_publisher' publisher.pk %}" class="btn btn-subscribe">Subscribe</a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-message">No publishers available</div>
+            {% endif %}
+        </div>
+        
+        <!-- Journalists Section -->
+        <div class="section">
+            <h2>Journalists</h2>
+            {% if journalists %}
+                <div class="items-grid">
+                    {% for journalist in journalists %}
+                        <div class="item-card {% if journalist in subscribed_journalists %}subscribed{% endif %}">
+                            <div class="item-name">
+                                {{ journalist.get_full_name|default:journalist.username }}
+                                {% if journalist in subscribed_journalists %}
+                                    <span class="badge">Subscribed</span>
+                                {% endif %}
+                            </div>
+                            <div class="item-description">
+                                {{ journalist.email }}
+                            </div>
+                            <div class="item-meta">
+                                Articles: {{ journalist.independent_articles.count }}
+                            </div>
+                            {% if journalist in subscribed_journalists %}
+                                <a href="{% url 'unsubscribe_journalist' journalist.pk %}" class="btn btn-unsubscribe">Unsubscribe</a>
+                            {% else %}
+                                <a href="{% url 'subscribe_journalist' journalist.pk %}" class="btn btn-subscribe">Subscribe</a>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="empty-message">No journalists available</div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Delete Newsletter - News App{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Confirm Deletion</h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <strong>Warning!</strong> This action cannot be undone.
+                    </div>
+                    
+                    <p>Are you sure you want to delete the following newsletter?</p>
+                    
+                    <div class="card mb-3">
+                        <div class="card-body bg-light">
+                            <h5 class="card-title">{{ newsletter.title }}</h5>
+                            <p class="card-text text-muted">
+                                <small>
+                                    Published: {{ newsletter.published_date|date:"M d, Y" }}
+                                    {% if newsletter.publisher %}
+                                    | Publisher: {{ newsletter.publisher.name }}
+                                    {% endif %}
+                                </small>
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-4">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                Yes, Delete Newsletter
+                            </button>
+                            <a href="{% url 'my_newsletters' %}" class="btn btn-secondary btn-lg">
+                                Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

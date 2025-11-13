@@ -1,0 +1,37 @@
+{% extends 'news_app/base.html' %}
+
+{% block title %}Request to Join {{ publisher.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Request to Join {{ publisher.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <p>You are about to request to join <strong>{{ publisher.name }}</strong> as a <strong>{{ user.get_role_display }}</strong>.</p>
+                    
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message (Optional)</label>
+                            <textarea name="message" 
+                                      class="form-control" 
+                                      rows="4" 
+                                      placeholder="Introduce yourself and explain why you want to join..."></textarea>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <button type="submit" class="btn btn-primary">Submit Request</button>
+                            <a href="{% url 'publisher_detail' publisher.pk %}" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

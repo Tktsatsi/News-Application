@@ -1,0 +1,178 @@
+{% extends 'news_app/base.html' %}
+
+{% block title %}{{ title }} - News App{% endblock %}
+
+{% block extra_css %}
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .back-link:hover {
+            text-decoration: underline;
+            transform: translateX(-5px);
+        }
+        
+        .page-header {
+            margin-bottom: 30px;
+        }
+        
+        .page-header h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+        
+        .subtitle {
+            color: #666;
+            font-size: 1em;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        
+        .required {
+            color: #e74c3c;
+        }
+        
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .help-text {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 0 0;
+        }
+        
+        .errorlist li {
+            color: #e74c3c;
+            font-size: 0.9em;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .button-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <a href="{% url 'my_newsletters' %}" class="back-link">← Back to My Newsletters</a>
+        
+        <div class="page-header">
+            <h1>{{ title }}</h1>
+            <p class="subtitle">Fill in the details below to create your newsletter</p>
+        </div>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.title.id_for_label }}">
+                    Newsletter Title <span class="required">*</span>
+                </label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.title.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.content.id_for_label }}">
+                    Newsletter Content <span class="required">*</span>
+                </label>
+                {{ form.content }}
+                {% if form.content.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.content.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.publisher.id_for_label }}">
+                    Publisher
+                </label>
+                {{ form.publisher }}
+                <span class="help-text">Select a publisher or leave blank to publish independently</span>
+                {% if form.publisher.errors %}
+                    <ul class="errorlist">
+                        {% for error in form.publisher.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">
+                    {% if newsletter %}Update Newsletter{% else %}Create Newsletter{% endif %}
+                </button>
+                <a href="{% url 'my_newsletters' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

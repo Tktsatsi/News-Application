@@ -1,0 +1,48 @@
+{% extends "news_app/base.html" %}
+
+{% block title %}Approve Article - News Application{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>Approve Article</h1>
+    
+    <h2>{{ article.title }}</h2>
+    <p style="color: #7f8c8d; margin-bottom: 1rem;">
+        By {{ article.author.get_full_name|default:article.author.username }}
+        {% if article.publisher %}
+            | {{ article.publisher.name }}
+        {% endif %}
+    </p>
+    
+    {% if article.summary %}
+        <p style="font-style: italic; margin-bottom: 1rem; 
+                  padding: 1rem; background-color: #ecf0f1; 
+                  border-left: 4px solid #3498db;">
+            {{ article.summary }}
+        </p>
+    {% endif %}
+    
+    <div style="line-height: 1.8; white-space: pre-wrap; 
+                margin-bottom: 1.5rem;">
+        {{ article.content }}
+    </div>
+    
+    <div style="padding: 1rem; background-color: #fff3cd; 
+                border-left: 4px solid #ffc107; margin-bottom: 1.5rem;">
+        <p><strong>Note:</strong> Approving this article will:</p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            <li>Publish the article immediately</li>
+            <li>Send email notifications to all subscribers</li>
+            <li>Make the article visible to all readers</li>
+        </ul>
+    </div>
+    
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-success">
+            Approve Article
+        </button>
+        <a href="{% url 'pending_articles' %}" class="btn">Cancel</a>
+    </form>
+</div>
+{% endblock %}

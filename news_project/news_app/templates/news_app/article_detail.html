@@ -1,0 +1,47 @@
+{% extends "news_app/base.html" %}
+
+{% block title %}{{ article.title }} - News Application{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h1>{{ article.title }}</h1>
+    
+    <p style="color: #7f8c8d; margin-bottom: 1rem;">
+        By {{ article.author.get_full_name|default:article.author.username }}
+        {% if article.publisher %}
+            | {{ article.publisher.name }}
+        {% endif %}
+        {% if article.is_approved %}
+            | Published on {{ article.published_date|date:"F d, Y" }}
+        {% else %}
+            | <span class="badge badge-warning">Pending Approval</span>
+        {% endif %}
+    </p>
+    
+    {% if article.summary %}
+        <p style="font-style: italic; margin-bottom: 1.5rem; 
+                  padding: 1rem; background-color: #ecf0f1; 
+                  border-left: 4px solid #3498db;">
+            {{ article.summary }}
+        </p>
+    {% endif %}
+    
+    <div style="line-height: 1.8; white-space: pre-wrap;">
+        {{ article.content }}
+    </div>
+    
+    {% if article.approved_by %}
+        <p style="margin-top: 1.5rem; color: #7f8c8d; 
+                  font-size: 0.875rem;">
+            Approved by {{ article.approved_by.get_full_name|default:article.approved_by.username }}
+            on {{ article.approval_date|date:"F d, Y" }}
+        </p>
+    {% endif %}
+    
+    <div style="margin-top: 2rem;">
+        <a href="{% url 'article_list' %}" class="btn">
+            Back to Articles
+        </a>
+    </div>
+</div>
+{% endblock %}

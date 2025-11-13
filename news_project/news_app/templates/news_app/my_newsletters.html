@@ -1,0 +1,230 @@
+{% extends 'news_app/base.html' %}
+
+{% block title %}My Newsletters - News App{% endblock %}
+
+{% block extra_css %}
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 2em;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        
+        .newsletters-section {
+            margin-top: 30px;
+        }
+        
+        .section-title {
+            font-size: 1.3em;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .newsletter-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .newsletter-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .newsletter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+            gap: 20px;
+        }
+        
+        .newsletter-title {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: 600;
+            flex: 1;
+        }
+        
+        .publisher-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            white-space: nowrap;
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .publisher-badge.independent {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .newsletter-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            font-size: 0.9em;
+            color: #666;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .newsletter-preview {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .newsletter-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .newsletter-header {
+                flex-direction: column;
+            }
+            
+            .newsletter-actions {
+                flex-direction: column;
+            }
+            
+            .btn-sm {
+                width: 100%;
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .header-actions .btn {
+                width: 100%;
+            }
+        }
+{% endblock %}
+
+{% block content %}
+    <header>
+        <h1>My Newsletters</h1>
+        <div class="header-actions">
+            <a href="{% url 'create_newsletter' %}" class="btn btn-primary">+ Create New Newsletter</a>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">Dashboard</a>
+        </div>
+    </header>
+    
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_count }}</div>
+            <div class="stat-label">Total Newsletters</div>
+        </div>
+    </div>
+    
+    <div class="newsletters-section">
+        <h2 class="section-title">Your Newsletters</h2>
+        
+        {% if newsletters %}
+            {% for newsletter in newsletters %}
+            <div class="newsletter-card">
+                <div class="newsletter-header">
+                    <h3 class="newsletter-title">{{ newsletter.title }}</h3>
+                    {% if newsletter.publisher %}
+                        <span class="publisher-badge">{{ newsletter.publisher.name }}</span>
+                    {% else %}
+                        <span class="publisher-badge independent">Independent</span>
+                    {% endif %}
+                </div>
+                
+                <div class="newsletter-meta">
+                    <div class="meta-item">
+                        <strong>Published:</strong> {{ newsletter.published_date|date:"M d, Y" }}
+                    </div>
+                    <div class="meta-item">
+                        <strong>Created:</strong> {{ newsletter.created_at|date:"M d, Y" }}
+                    </div>
+                </div>
+                
+                <p class="newsletter-preview">{{ newsletter.content|truncatewords:30 }}</p>
+                
+                <div class="newsletter-actions">
+                    <a href="{% url 'newsletter_detail' newsletter.pk %}" class="btn btn-secondary btn-sm">View</a>
+                    <a href="{% url 'edit_newsletter' newsletter.pk %}" class="btn btn-success btn-sm">Edit</a>
+                    <a href="{% url 'delete_newsletter' newsletter.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <h3>No newsletters yet</h3>
+                <p>You haven't created any newsletters yet. Start by creating your first newsletter!</p>
+                <a href="{% url 'create_newsletter' %}" class="btn btn-primary">Create Your First Newsletter</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

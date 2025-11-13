@@ -1,0 +1,175 @@
+{% extends "news_app/base.html" %}
+
+{% block title %}Dashboard - News Application{% endblock %}
+
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="card">
+    <h2>Welcome, {{ user.get_full_name|default:user.username }}!</h2>
+    <p>Role: <span class="badge">{{ user.get_role_display }}</span></p>
+</div>
+
+{% if user.role == 'reader' %}
+    <div class="card">
+        <h3>Your Subscriptions</h3>
+        
+        <h4>Subscribed Publishers ({{ subscribed_publishers.count }})</h4>
+        {% if subscribed_publishers %}
+            <ul>
+                {% for publisher in subscribed_publishers %}
+                    <li>{{ publisher.name }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You are not subscribed to any publishers yet.</p>
+        {% endif %}
+        
+        <h4 style="margin-top: 1rem;">
+            Subscribed Journalists ({{ subscribed_journalists.count }})
+        </h4>
+        {% if subscribed_journalists %}
+            <ul>
+                {% for journalist in subscribed_journalists %}
+                    <li>
+                        {{ journalist.get_full_name|default:journalist.username }}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>You are not subscribed to any journalists yet.</p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h3>Latest Articles</h3>
+        {% if latest_articles %}
+            {% for article in latest_articles %}
+                <div style="margin-bottom: 1rem; 
+                            padding-bottom: 1rem; 
+                            border-bottom: 1px solid #ecf0f1;">
+                    <h4>
+                        <a href="{% url 'article_detail' article.pk %}" 
+                           style="color: #2c3e50; text-decoration: none;">
+                            {{ article.title }}
+                        </a>
+                    </h4>
+                    <p style="color: #7f8c8d; font-size: 0.875rem;">
+                        {{ article.published_date|date:"F d, Y" }}
+                    </p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No articles available.</p>
+        {% endif %}
+    </div>
+
+{% elif user.role == 'editor' %}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="card">
+            <h3>Pending Approvals</h3>
+            <p style="font-size: 2rem; font-weight: bold; 
+                      color: #f39c12;">
+                {{ pending_count }}
+            </p>
+            <a href="{% url 'pending_articles' %}" class="btn">
+                Review Articles
+            </a>
+        </div>
+        
+        <div class="card">
+            <h3>Articles Approved by You</h3>
+            <p style="font-size: 2rem; font-weight: bold; 
+                      color: #27ae60;">
+                {{ approved_count }}
+            </p>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h3>Recent Pending Articles</h3>
+        {% if recent_pending %}
+            {% for article in recent_pending %}
+                <div style="margin-bottom: 1rem; 
+                            padding-bottom: 1rem; 
+                            border-bottom: 1px solid #ecf0f1;">
+                    <h4>{{ article.title }}</h4>
+                    <p style="color: #7f8c8d; font-size: 0.875rem;">
+                        By {{ article.author.username }} | 
+                        Submitted {{ article.created_at|date:"F d, Y" }}
+                    </p>
+                    <a href="{% url 'approve_article' article.pk %}" 
+                       class="btn btn-success">Approve</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No pending articles.</p>
+        {% endif %}
+    </div>
+
+{% elif user.role == 'journalist' %}
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div class="card">
+            <h3>Approved Articles</h3>
+            <p style="font-size: 2rem; font-weight: bold; 
+                      color: #27ae60;">
+                {{ approved_articles }}
+            </p>
+        </div>
+        
+        <div class="card">
+            <h3>Pending Approval</h3>
+            <p style="font-size: 2rem; font-weight: bold; 
+                      color: #f39c12;">
+                {{ pending_articles }}
+            </p>
+        </div>
+    </div>
+<!-- Newsletters Section -->
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4>My Newsletters</h4>
+                <a href="{% url 'create_newsletter' %}" class="btn btn-sm btn-primary">
+                    + New Newsletter
+                </a>
+            </div>
+            <div class="card-body">
+                <p><strong>Total:</strong> {{ total_newsletters|default:0 }}</p>
+                <a href="{% url 'my_newsletters' %}" class="btn btn-outline-primary">
+                    View All Newsletters
+                </a>
+            </div>
+        </div>
+    </div>    
+    
+    <div class="card">
+        <h3>Your Recent Articles</h3>
+        {% if my_articles %}
+            {% for article in my_articles %}
+                <div style="margin-bottom: 1rem; 
+                            padding-bottom: 1rem; 
+                            border-bottom: 1px solid #ecf0f1;">
+                    <h4>
+                        <a href="{% url 'article_detail' article.pk %}" 
+                           style="color: #2c3e50; text-decoration: none;">
+                            {{ article.title }}
+                        </a>
+                    </h4>
+                    <p style="color: #7f8c8d; font-size: 0.875rem;">
+                        {% if article.is_approved %}
+                            <span class="badge badge-success">Approved</span>
+                            {{ article.published_date|date:"F d, Y" }}
+                        {% else %}
+                            <span class="badge badge-warning">Pending</span>
+                            Submitted {{ article.created_at|date:"F d, Y" }}
+                        {% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>You haven't submitted any articles yet.</p>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

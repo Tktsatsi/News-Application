@@ -1,0 +1,87 @@
+{% extends 'news_app/base.html' %}
+
+{% block title %}All Publishers{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>All Publishers ({{ total_count }})</h2>
+        {% if user.is_authenticated and user.role == 'publisher' %}
+        <a href="{% url 'create_publisher' %}" class="btn btn-primary">
+            Create New Publisher
+        </a>
+        {% endif %}
+    </div>
+    
+    {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    
+    {% if publishers %}
+    <div class="row">
+        {% for publisher in publishers %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a href="{% url 'publisher_detail' publisher.pk %}" class="text-decoration-none">
+                            {{ publisher.name }}
+                        </a>
+                    </h5>
+                    
+                    {% if publisher.description %}
+                    <p class="card-text text-muted">
+                        {{ publisher.description|truncatewords:20 }}
+                    </p>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            <i class="bi bi-people"></i> 
+                            {{ publisher.editors.count }} editor{{ publisher.editors.count|pluralize }}, 
+                            {{ publisher.journalists.count }} journalist{{ publisher.journalists.count|pluralize }}
+                        </small>
+                    </div>
+                    
+                    {% if publisher.website %}
+                    <div class="mt-2">
+                        <small>
+                            <a href="{{ publisher.website }}" target="_blank" class="text-decoration-none">
+                                <i class="bi bi-globe"></i> Visit Website
+                            </a>
+                        </small>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            Established: {{ publisher.established_date|date:"Y"|default:"N/A" }}
+                        </small>
+                    </div>
+                </div>
+                
+                <div class="card-footer bg-transparent">
+                    <a href="{% url 'publisher_detail' publisher.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <p class="mb-0">No publishers found. 
+            {% if user.is_authenticated and user.role == 'publisher' %}
+            <a href="{% url 'create_publisher' %}">Create the first publisher</a>
+            {% endif %}
+        </p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
