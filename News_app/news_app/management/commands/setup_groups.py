@@ -45,7 +45,8 @@ class Command(BaseCommand):
 
         # Reader permissions - can only view
         reader_permissions = Permission.objects.filter(
-            content_type__in=[article_ct, newsletter_ct], codename__startswith="view_"
+            content_type__in=[article_ct, newsletter_ct],
+            codename__startswith="view_"
         )
         reader_group.permissions.set(reader_permissions)
         self.stdout.write(

@@ -67,7 +67,9 @@ class NewsletterForm(forms.ModelForm):
         fields = ["title", "content", "publisher"]
         widgets = {
             "title": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Enter newsletter title"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Enter newsletter title"}
             ),
             "content": forms.Textarea(
                 attrs={
@@ -122,7 +124,9 @@ class PublisherForm(forms.ModelForm):
         fields = ["name", "description", "website", "established_date"]
         widgets = {
             "name": forms.TextInput(
-                attrs={"class": "form-control", "placeholder": "Publisher name"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "Publisher name"}
             ),
             "description": forms.Textarea(
                 attrs={
@@ -132,7 +136,9 @@ class PublisherForm(forms.ModelForm):
                 }
             ),
             "website": forms.URLInput(
-                attrs={"class": "form-control", "placeholder": "https://example.com"}
+                attrs={
+                    "class": "form-control",
+                    "placeholder": "https://example.com"}
             ),
             "established_date": forms.DateInput(
                 attrs={"class": "form-control", "type": "date"}

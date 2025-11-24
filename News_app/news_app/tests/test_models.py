@@ -113,7 +113,9 @@ class ArticleModelTest(TestCase):
         reader = CustomUser.objects.create_user(
             username="reader1", password="testpass123", role="reader"
         )
-        article = Article(title="Invalid Article", content="Content", author=reader)
+        article = Article(title="Invalid Article",
+                          content="Content",
+                          author=reader)
         with self.assertRaises(ValidationError):
             article.full_clean()
 
@@ -137,7 +139,8 @@ class NewsletterModelTest(TestCase):
     def test_newsletter_creation(self):
         """Test newsletter is created successfully."""
         self.assertEqual(self.newsletter.title, "Test Newsletter")
-        self.assertEqual(str(self.newsletter), "Test Newsletter by journalist1")
+        self.assertEqual(str(self.newsletter),
+                         "Test Newsletter by journalist1")
 
     def test_newsletter_requires_journalist_author(self):
         """Test newsletter author must be a journalist."""

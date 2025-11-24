@@ -272,7 +272,11 @@ def main():
         publisher1, publisher2 = create_publishers()
 
         # Create articles
-        create_articles(editor, journalist1, journalist2, publisher1, publisher2)
+        create_articles(editor,
+                        journalist1,
+                        journalist2,
+                        publisher1,
+                        publisher2)
 
         # Set up subscriptions
         create_subscriptions(reader, journalist1, publisher1)
