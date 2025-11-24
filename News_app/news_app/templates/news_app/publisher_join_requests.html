@@ -1,0 +1,185 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Join Requests - {{ publisher.name }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'news_app/publishers.css' %}">
+<link rel="stylesheet" href="{% static 'news_app/requests.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <h1 class="hero-title">📥 Join Requests</h1>
+    <p class="hero-subtitle">Manage requests to join {{ publisher.name }}</p>
+    
+    <div class="stats-bar" style="margin-top: 20px;">
+        <div class="stat-item">
+            <div class="stat-number">{{ pending_count }}</div>
+            <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ approved_count }}</div>
+            <div class="stat-label">Approved</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ rejected_count }}</div>
+            <div class="stat-label">Rejected</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">{{ total_count }}</div>
+            <div class="stat-label">Total</div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Filter Tabs -->
+<div class="request-tabs">
+    <a href="?status=pending" class="request-tab {% if status_filter == 'pending' %}active{% endif %}">
+        ⏳ Pending ({{ pending_count }})
+    </a>
+    <a href="?status=approved" class="request-tab {% if status_filter == 'approved' %}active{% endif %}">
+        ✅ Approved ({{ approved_count }})
+    </a>
+    <a href="?status=rejected" class="request-tab {% if status_filter == 'rejected' %}active{% endif %}">
+        ❌ Rejected ({{ rejected_count }})
+    </a>
+    <a href="?status=all" class="request-tab {% if status_filter == 'all' %}active{% endif %}">
+        📋 All ({{ total_count }})
+    </a>
+</div>
+
+<!-- Requests List -->
+{% if requests_list %}
+    <div class="requests-grid">
+        {% for req in requests_list %}
+        <div class="request-card">
+            <div class="request-header">
+                <div class="request-user-info">
+                    <div class="user-avatar">
+                        {% if req.user.role == 'journalist' %}
+                            ✍️
+                        {% elif req.user.role == 'editor' %}
+                            ✏️
+                        {% else %}
+                            👤
+                        {% endif %}
+                    </div>
+                    <div class="user-details">
+                        <h3 class="user-name">{{ req.user.get_full_name|default:req.user.username }}</h3>
+                        <p class="user-role">@{{ req.user.username }} • {{ req.user.get_role_display }}</p>
+                    </div>
+                </div>
+                <div class="request-status-badge status-{{ req.status }}">
+                    {{ req.get_status_display }}
+                </div>
+            </div>
+            
+            <div class="request-body">
+                {% if req.message %}
+                <div class="request-message">
+                    <strong>📝 Message:</strong>
+                    <p>{{ req.message }}</p>
+                </div>
+                {% else %}
+                <div class="request-message">
+                    <p class="no-message">No message provided</p>
+                </div>
+                {% endif %}
+                
+                <div class="request-meta">
+                    <div class="meta-item">
+                        <span>📅</span>
+                        <span>Requested: {{ req.created_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% if req.reviewed_at %}
+                    <div class="meta-item">
+                        <span>👤</span>
+                        <span>Reviewed by: {{ req.reviewed_by.username|default:"N/A" }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span>⏰</span>
+                        <span>Reviewed: {{ req.reviewed_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if req.status == 'pending' %}
+            <div class="request-actions">
+                <a href="{% url 'approve_join_request' req.id %}" class="btn btn-success btn-sm">
+                    ✅ Approve
+                </a>
+                <a href="{% url 'reject_join_request' req.id %}" class="btn btn-danger btn-sm">
+                    ❌ Reject
+                </a>
+            </div>
+            {% elif req.status == 'approved' %}
+            <div class="request-info">
+                <p class="success-message">
+                    ✅ This user has been added to your team as a {{ req.user.get_role_display|lower }}.
+                </p>
+            </div>
+            {% elif req.status == 'rejected' %}
+            <div class="request-info">
+                <p class="rejected-message">
+                    ❌ This request was rejected on {{ req.reviewed_at|date:"M d, Y" }}.
+                </p>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="empty-state">
+        <div class="empty-state-icon">
+            {% if status_filter == 'pending' %}
+                ⏳
+            {% elif status_filter == 'approved' %}
+                ✅
+            {% elif status_filter == 'rejected' %}
+                ❌
+            {% else %}
+                📋
+            {% endif %}
+        </div>
+        <h3>
+            {% if status_filter == 'pending' %}
+                No Pending Requests
+            {% elif status_filter == 'approved' %}
+                No Approved Requests
+            {% elif status_filter == 'rejected' %}
+                No Rejected Requests
+            {% else %}
+                No Join Requests
+            {% endif %}
+        </h3>
+        <p>
+            {% if status_filter == 'pending' %}
+                There are no pending join requests at the moment.
+            {% elif status_filter == 'approved' %}
+                No requests have been approved yet.
+            {% elif status_filter == 'rejected' %}
+                No requests have been rejected.
+            {% else %}
+                No join requests have been submitted yet.
+            {% endif %}
+        </p>
+        {% if status_filter != 'all' %}
+        <a href="?status=all" class="btn btn-secondary">
+            View All Requests
+        </a>
+        {% endif %}
+    </div>
+{% endif %}
+
+<!-- Back to Dashboard -->
+<div class="action-buttons" style="margin-top: 40px;">
+    <a href="{% url 'publisher_dashboard' publisher.pk %}" class="btn btn-secondary">
+        ← Back to Dashboard
+    </a>
+    <a href="{% url 'publisher_detail' publisher.pk %}" class="btn btn-primary">
+        View Publisher Page
+    </a>
+</div>
+{% endblock %}

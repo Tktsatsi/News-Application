@@ -1,0 +1,19 @@
+/* ===== FORM SPECIFIC STYLES ===== */
+/* Most form styles are in style.css, this file is kept for any form-specific overrides */
+
+.form-container {
+    max-width: 800px;
+}
+
+.form-icon {
+    font-size: 3em;
+    margin-bottom: 15px;
+}
+
+.form-title {
+    font-size: 2.2em;
+}
+
+textarea.form-control {
+    min-height: 200px;
+}

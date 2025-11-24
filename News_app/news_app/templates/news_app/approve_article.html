@@ -1,0 +1,116 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Review Article - News App{% endblock %}
+
+<link rel="stylesheet" href="{% static 'news_app/articles.css' %}">
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+    <div class="review-hero">
+        <div class="review-icon">✅</div>
+        <h1 class="review-title">Review Article</h1>
+        <p class="review-subtitle">Approve or reject this article for publication</p>
+    </div>
+    
+    <div class="article-preview-section">
+        <h3 style="color: #667eea; margin-bottom: 20px;">📰 Article Preview</h3>
+        
+        {% if article.image %}
+        <div class="article-image-container">
+            <img src="{{ article.image.url }}" alt="{{ article.title }}">
+        </div>
+        {% else %}
+        <div class="article-placeholder-large">
+            📰
+        </div>
+        {% endif %}
+        
+        <h2 class="article-title-preview">{{ article.title }}</h2>
+        
+        <div class="article-meta-preview">
+            <div class="meta-item">
+                <span>👤</span>
+                <span>By <strong>{{ article.author.username }}</strong></span>
+            </div>
+            <div class="meta-item">
+                <span>📅</span>
+                <span>{{ article.published_date|date:"F d, Y" }}</span>
+            </div>
+            {% if article.publisher %}
+            <div class="meta-item">
+                <span>🏢</span>
+                <span><strong>{{ article.publisher.name }}</strong></span>
+            </div>
+            {% endif %}
+            <div class="meta-item">
+                <span>Status:</span>
+                <span style="color: #f5576c; font-weight: 600;">{{ article.get_status_display }}</span>
+            </div>
+        </div>
+        
+        {% if article.summary %}
+        <div style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%); padding: 20px; border-radius: 12px; margin-bottom: 25px; border-left: 4px solid #667eea;">
+            <h4 style="color: #667eea; margin-bottom: 10px;">Summary</h4>
+            <p style="color: #666; font-style: italic; line-height: 1.6; margin: 0;">{{ article.summary }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="article-content-preview">
+            <h4 style="color: #333; margin-bottom: 15px;">Content</h4>
+            {{ article.content|safe }}
+        </div>
+    </div>
+    
+    <div class="review-form-section">
+        <h3>📝 Review Decision</h3>
+        
+        <div class="decision-hint">
+            <h4>💡 Review Guidelines</h4>
+            <ul>
+                <li>Check for accuracy and quality of content</li>
+                <li>Ensure proper formatting and readability</li>
+                <li>Verify appropriate tone and style</li>
+                <li>Confirm compliance with publication standards</li>
+            </ul>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="id_status">Decision *</label>
+                {{ form.status }}
+            </div>
+            
+            {% if form.feedback %}
+            <div class="form-group">
+                <label for="id_feedback">Feedback (Optional)</label>
+                {{ form.feedback }}
+                <small style="color: #999; display: block; margin-top: 8px;">
+                    Provide constructive feedback to the author
+                </small>
+            </div>
+            {% endif %}
+            
+            {% if form.errors %}
+            <div style="background: #fee; border-left: 4px solid #f00; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                <strong style="color: #c00;">Please correct the errors below:</strong>
+                {{ form.errors }}
+            </div>
+            {% endif %}
+            
+            <div class="action-buttons">
+                <a href="{% url 'pending_articles' %}" >
+                    <button type="submit" class="btn btn-secondary">← Back to Queue</button>
+                </a>
+                <a href="{% url 'approve_article' article.pk %}" >    
+                    <button type="submit" class="btn btn-primary">✔️ Approve</button>
+                </a>
+                    <a href="{% url 'reject_article' article.pk %}" >
+                        <button type="submit" class="btn btn-danger">❌ Reject</button>
+                    </a>
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,93 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Pending Articles - News App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'news_app/pending.css' %}">
+<link rel="stylesheet" href="{% static 'news_app/articles.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="hero-section">
+        <h1 class="hero-title">⏳ Pending Articles</h1>
+        <p class="hero-subtitle">Articles awaiting your review and approval</p>
+        
+        <div class="stats-badge">
+            <span>📝</span>
+            <span>{{ articles.count }} Article{{ articles.count|pluralize }} Pending</span>
+        </div>
+    </div>
+    
+    <div class="section-header">
+        <h2 class="section-title">Review Queue</h2>
+        {% if articles.count > 0 %}
+        <span class="form-help">👥 Editor Review Required</span>
+        {% endif %}
+    </div>
+    
+    {% if articles %}
+        <div class="article-grid">
+            {% for article in articles %}
+            <div class="article-card">
+                {% if article.image %}
+                <div class="article-image">
+                    <img src="{{ article.image.url }}" alt="{{ article.title }}">
+                </div>
+                {% else %}
+                <div class="article-placeholder">
+                    📰
+                </div>
+                {% endif %}
+                
+                <div class="article-content">
+                    <div class="article-title-header">
+                        <h3 class="article-title">{{ article.title }}</h3>
+                        <span class="status-badge status-pending">{{ article.get_status_display }}</span>
+                    </div>
+                    
+                    <div class="article-meta">
+                        <div class="meta-item">
+                            <span>By</span>
+                            <span class="article-author">{{ article.author.username }}</span>
+                        </div>
+                        <div class="meta-item">
+                            📅 {{ article.published_date|date:"M d, Y" }}
+                        </div>
+                        {% if article.publisher %}
+                        <div class="meta-item">
+                            🏢 {{ article.publisher.name }}
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if article.summary %}
+                    <p class="article-summary">{{ article.summary }}</p>
+                    {% endif %}
+                    
+                    <div class="action-buttons-card">
+                        <a href="{% url 'article_detail' article.pk %}" class="btn btn-secondary btn-sm">
+                            👁️ View
+                        </a>
+                        <a href="{% url 'approve_article' article.pk %}" class="btn btn-primary btn-sm">
+                            ✅ Review
+                        </a>
+                        <a href="{% url 'reject_article' article.pk %}" class="btn btn-danger btn-sm">
+                            ❌ Reject
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            <h3>All Clear!</h3>
+            <p>No pending articles to review at the moment.</p>
+            <a href="{% url 'article_list' %}" class="btn btn-primary">
+                View All Articles →
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}

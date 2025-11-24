@@ -1,0 +1,85 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}{{ newsletter.title }} - News App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'news_app/newsletters.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="newsletter-hero">
+        <div class="newsletter-icon">📧</div>
+        <h1 class="newsletter-title-main">{{ newsletter.title }}</h1>
+        
+        <div class="subscribers-badge">
+            <span>👥</span>
+            <span>{{ newsletter.subscribers.count }} Subscribers</span>
+        </div>
+    </div>
+    
+    <div class="newsletter-meta-bar">
+        {% if newsletter.publisher %}
+        <div class="meta-item">
+            <span>🏢</span>
+            <span>Published by <strong>{{ newsletter.publisher.name }}</strong></span>
+        </div>
+        {% endif %}
+        <div class="meta-item">
+            <span>📅</span>
+            <span>Created {{ newsletter.created_at|date:"F d, Y" }}</span>
+        </div>
+    </div>
+    
+    <div class="newsletter-content-section">
+        <h3>📝 About This Newsletter</h3>
+        {{ newsletter.description|safe }}
+    </div>
+    
+    {% if newsletter.publisher %}
+    <div class="publisher-info-card">
+        <h3>🏢 About {{ newsletter.publisher.name }}</h3>
+        <p>{{ newsletter.publisher.description }}</p>
+        <a href="{% url 'publisher_detail' newsletter.publisher.pk %}" class="btn btn-secondary btn-sm">
+            View Publisher →
+        </a>
+    </div>
+    {% endif %}
+    
+    <div class="action-buttons">
+        <a href="{% url 'newsletter_list' %}" class="btn btn-secondary">
+            ← Back to Newsletters
+        </a>
+        
+        {% if user.is_authenticated %}
+            {% if user in newsletter.subscribers.all %}
+                <form method="post" action="{% url 'unsubscribe_newsletter' newsletter.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        🔕 Unsubscribe
+                    </button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'subscribe_newsletter' newsletter.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">
+                        ✉️ Subscribe
+                    </button>
+                </form>
+            {% endif %}
+            
+            {% if user.role == 'publisher' and newsletter.publisher and user.publisher == newsletter.publisher %}
+                <a href="{% url 'newsletter_update' newsletter.pk %}" class="btn btn-primary">
+                    ✏️ Edit Newsletter
+                </a>
+                <a href="{% url 'newsletter_delete' newsletter.pk %}" class="btn btn-danger">
+                    🗑️ Delete Newsletter
+                </a>
+            {% endif %}
+        {% else %}
+            <a href="{% url 'login' %}" class="btn btn-primary">
+                Login to Subscribe
+            </a>
+        {% endif %}
+    </div>
+{% endblock %}

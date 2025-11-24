@@ -1,0 +1,124 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Join Publisher - News App{% endblock %}
+
+<link rel="stylesheet" href="{% static 'news_app/requests.css' %}">
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+    <div class="request-hero">
+        <div class="request-icon">📝</div>
+        <h1 class="request-title">Request to Join Publisher</h1>
+        <p class="request-subtitle">Apply to become a member of {{ publisher.name }}</p>
+    </div>
+    
+    {% if user.publisher %}
+    <div class="current-publisher-notice">
+        <h4>ℹ️ Current Publisher</h4>
+        <p>You are currently a member of <strong>{{ user.publisher.name }}</strong>. Joining a new publisher will replace your current affiliation.</p>
+    </div>
+    {% endif %}
+    
+    <div class="publisher-info-section">
+        <h3>🏢 About {{ publisher.name }}</h3>
+        
+        <div class="info-item">
+            <span class="info-label">Publisher Name:</span>
+            <span class="info-value">{{ publisher.name }}</span>
+        </div>
+        
+        <div class="info-item">
+            <span class="info-label">Description:</span>
+            <span class="info-value">{{ publisher.description|truncatewords:50 }}</span>
+        </div>
+        
+        <div class="info-item">
+            <span class="info-label">Team Size:</span>
+            <span class="info-value">{{ publisher.members.count }} member{{ publisher.members.count|pluralize }}</span>
+        </div>
+        
+        <div class="info-item">
+            <span class="info-label">Published Articles:</span>
+            <span class="info-value">{{ publisher.articles.count }} article{{ publisher.articles.count|pluralize }}</span>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <a href="{% url 'publisher_detail' publisher.pk %}" class="btn btn-secondary btn-sm">
+                👁️ View Full Publisher Profile
+            </a>
+        </div>
+    </div>
+    
+    <div class="form-container">
+        <h3>📋 Your Application</h3>
+        
+        <div class="form-info">
+            <h4>💡 Application Tips</h4>
+            <ul>
+                <li>Explain why you want to join this publisher</li>
+                <li>Highlight relevant experience or interests</li>
+                <li>Be professional and concise</li>
+                <li>The publisher owner will review your request</li>
+            </ul>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="message" class="required-field">
+                    Introduction Message
+                </label>
+                <textarea 
+                    name="message" 
+                    id="message" 
+                    class="form-control" 
+                    required
+                    placeholder="Tell {{ publisher.name }} why you'd like to join their team..."></textarea>
+                <span class="help-text">
+                    Share your background, interests, and what you hope to contribute
+                </span>
+            </div>
+            
+            <div class="form-group">
+                <label for="portfolio">
+                    Portfolio or Sample Work (Optional)
+                </label>
+                <textarea 
+                    name="portfolio" 
+                    id="portfolio" 
+                    class="form-control" 
+                    placeholder="Include links to your previous work or writing samples..."></textarea>
+                <span class="help-text">
+                    Share links to articles, blog posts, or other relevant work
+                </span>
+            </div>
+            
+            <div class="action-buttons">
+                <a href="{% url 'publisher_detail' publisher.pk %}" class="btn btn-secondary">
+                    ← Cancel
+                </a>
+                <button type="submit" class="btn-submit">
+                    📤 Submit Request
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    <div style="text-align: center; color: #999; font-size: 0.9em; margin-top: 20px;">
+        <p>💡 Once submitted, the publisher owner will review your request and contact you</p>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-resize textarea
+    document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+</script>
+{% endblock %}

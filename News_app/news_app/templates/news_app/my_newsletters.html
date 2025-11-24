@@ -1,0 +1,61 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}My Newsletters - News App{% endblock %}
+
+<link rel="stylesheet" href="{% static 'news_app/newsletters.css' %}">
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+    <div class="hero-section">
+        <h1 class="hero-title">📧 My Newsletters</h1>
+        <p class="hero-subtitle">Manage your newsletters</p>
+        <a href="{% url 'create_newsletter' %}" class="btn btn-primary" style="margin-top: 10px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            ✏️ Create New Newsletter
+        </a>
+    </div>
+
+    {% if newsletters %}
+        <div class="newsletter-grid">
+            {% for newsletter in newsletters %}
+            <div class="newsletter-card">
+                <div class="newsletter-header">
+                    📧
+                </div>
+                
+                <div class="newsletter-content">
+                    <h3 class="newsletter-title">{{ newsletter.title }}</h3>
+                    
+                    <div class="newsletter-meta">
+                        <span>📅 {{ newsletter.published_date|date:"M d, Y" }}</span>
+                        {% if newsletter.publisher %}
+                        <span>🏢 {{ newsletter.publisher.name }}</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="newsletter-actions">
+                        <a href="{% url 'newsletter_detail' newsletter.pk %}" class="btn btn-primary btn-sm" style="flex: 1;">
+                            View
+                        </a>
+                        <a href="{% url 'edit_newsletter' newsletter.pk %}" class="btn btn-secondary btn-sm" style="flex: 1;">
+                            Edit
+                        </a>
+                        <a href="{% url 'delete_newsletter' newsletter.pk %}" class="btn btn-danger btn-sm" style="flex: 1;">
+                            Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📧</div>
+            <h3>No Newsletters Yet</h3>
+            <p>Start creating your first newsletter!</p>
+            <a href="{% url 'create_newsletter' %}" class="btn btn-primary" style="margin-top: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                Create Newsletter
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}

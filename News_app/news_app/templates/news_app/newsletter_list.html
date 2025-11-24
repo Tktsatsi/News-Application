@@ -1,0 +1,114 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Newsletters - News App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'news_app/newsletters.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="hero-section">
+        <h1 class="hero-title">📧 Newsletters</h1>
+        <p class="hero-subtitle">Subscribe to newsletters from your favorite publishers</p>
+        
+        <div class="stats-badge">
+            <span>📬</span>
+            <span>{{ newsletters.count }} Newsletter{{ newsletters.count|pluralize }} Available</span>
+        </div>
+    </div>
+    
+    <div class="section-header">
+        <h2 class="section-title">All Newsletters</h2>
+        {% if user.is_authenticated and user.role == 'publisher' %}
+        <a href="{% url 'newsletter_create' %}" class="btn btn-primary btn-sm">
+            ➕ Create Newsletter
+        </a>
+        {% endif %}
+    </div>
+    
+    {% if newsletters %}
+        <div class="newsletter-grid">
+            {% for newsletter in newsletters %}
+            <div class="newsletter-card">
+                <div class="newsletter-header">
+                    <div class="newsletter-icon-large">📧</div>
+                    <h3 class="newsletter-title">{{ newsletter.title }}</h3>
+                    {% if newsletter.publisher %}
+                    <div class="newsletter-publisher">
+                        <span>🏢</span>
+                        <span>{{ newsletter.publisher.name }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="newsletter-body">
+                    <p class="newsletter-description">{{ newsletter.description }}</p>
+                    
+                    <div class="newsletter-meta">
+                        <div class="meta-item">
+                            👥 {{ newsletter.subscribers.count }} subscriber{{ newsletter.subscribers.count|pluralize }}
+                        </div>
+                        <div class="meta-item">
+                            📅 {{ newsletter.created_at|date:"M Y" }}
+                        </div>
+                    </div>
+                    
+                    <div class="newsletter-actions">
+                        {% if user.is_authenticated %}
+                            {% if newsletter in user.subscribed_newsletters.all %}
+                                <span class="subscription-status">
+                                    ✓ Subscribed
+                                </span>
+                                <a href="{% url 'newsletter_detail' newsletter.pk %}" class="btn btn-secondary btn-sm">
+                                    👁️ View Details
+                                </a>
+                                <form method="post" action="{% url 'unsubscribe_newsletter' newsletter.pk %}" class="newsletter-actions">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger btn-sm">
+                                        🔕 Unsubscribe
+                                    </button>
+                                </form>
+                            {% else %}
+                                <a href="{% url 'newsletter_detail' newsletter.pk %}" class="btn btn-secondary btn-sm">
+                                    👁️ View Details
+                                </a>
+                                <form method="post" action="{% url 'subscribe_newsletter' newsletter.pk %}" class="newsletter-actions">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        ✉️ Subscribe
+                                    </button>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'newsletter_detail' newsletter.pk %}" class="btn btn-secondary btn-sm">
+                                👁️ View Details
+                            </a>
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-sm">
+                                Login to Subscribe
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📧</div>
+            <h3>No Newsletters Yet</h3>
+            <p>No newsletters have been created yet.</p>
+            {% if user.is_authenticated and user.role == 'publisher' %}
+                <a href="{% url 'newsletter_create' %}" class="btn btn-primary">
+                    ➕ Create the First Newsletter
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    {% if user.is_authenticated %}
+    <div class="browse-section">
+        <p>📬 Manage your subscriptions from <a href="{% url 'subscription_dashboard' %}" class="auth-link">My Subscriptions</a></p>
+    </div>
+    {% endif %}
+{% endblock %}
