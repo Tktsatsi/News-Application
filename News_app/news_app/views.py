@@ -59,11 +59,13 @@ def register(request):
             user = form.save()
             username = form.cleaned_data.get("username")
             role = form.cleaned_data.get("role")
-            messages.success(request, f"Account created for {username} as {role}!")
+            messages.success(request,
+                             f"Account created for {username} as {role}!")
             login(request, user)
             return redirect("home")
         messages.error(
-            request, "Registration failed. Please check the details and try again."
+            request,
+            "Registration failed. Please check the details and try again."
         )
     else:
         form = UserRegistrationForm()
@@ -162,7 +164,9 @@ def create_article(request):
         form = ArticleForm(user=request.user)
 
     return render(
-        request, "news_app/article_form.html", {"form": form, "title": "Create New Article"}
+        request,
+        "news_app/article_form.html",
+        {"form": form, "title": "Create New Article"}
     )
 
 
@@ -186,14 +190,19 @@ def edit_article(request, pk):
             messages.error(request, "You can only edit your own articles.")
             return redirect("my_articles")
         if article.is_approved:
-            messages.error(request, "Cannot edit approved articles. Contact an editor.")
+            messages.error(
+                request,
+                "Cannot edit approved articles. Contact an editor.")
             return redirect("my_articles")
     elif user.role != "editor":
         messages.error(request, "You do not have permission to edit articles.")
         return redirect("home")
 
     if request.method == "POST":
-        form = ArticleForm(request.POST, request.FILES, instance=article, user=user)
+        form = ArticleForm(request.POST,
+                           request.FILES,
+                           instance=article,
+                           user=user)
         if form.is_valid():
             article_instance = form.save(commit=False)
             if user.role == "journalist" and article_instance.is_rejected:
@@ -233,7 +242,8 @@ def delete_article(request, pk):
         return redirect("my_articles")
 
     if article.is_approved:
-        messages.error(request, "Cannot delete approved articles. Please contact an editor.")
+        messages.error(request,
+                       "Cannot delete approved articles. Please contact an editor.")
         return redirect("my_articles")
 
     if request.method == "POST":
@@ -241,7 +251,9 @@ def delete_article(request, pk):
         messages.success(request, "Article deleted successfully!")
         return redirect("my_articles")
 
-    return render(request, "news_app/article_confirm_delete.html", {"article": article})
+    return render(request,
+                  "news_app/article_confirm_delete.html",
+                  {"article": article})
 
 
 @login_required
@@ -323,7 +335,9 @@ def edit_newsletter(request, pk):
         return redirect("my_newsletters")
 
     if request.method == "POST":
-        form = NewsletterForm(request.POST, instance=newsletter, user=request.user)
+        form = NewsletterForm(request.POST,
+                              instance=newsletter,
+                              user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, "Newsletter updated successfully!")
@@ -557,7 +571,8 @@ def approve_article(request, pk):
     article = get_object_or_404(Article, pk=pk)
 
     if article.is_rejected:
-        messages.error(request, "This article was rejected and cannot be approved.")
+        messages.error(request,
+                       "This article was rejected and cannot be approved.")
         return redirect("pending_articles")
 
     if article.is_approved:
@@ -572,7 +587,8 @@ def approve_article(request, pk):
         article.save()
         return redirect("pending_articles")
 
-    return render(request, "news_app/approve_article.html", {"article": article})
+    return render(request,
+                  "news_app/approve_article.html", {"article": article})
 
 
 @login_required
@@ -597,7 +613,8 @@ def reject_article(request, pk):
         messages.success(request, "Article rejected.")
         return redirect("pending_articles")
 
-    return render(request, "news_app/reject_article.html", {"article": article})
+    return render(request,
+                  "news_app/reject_article.html", {"article": article})
 
 
 @login_required
@@ -668,7 +685,8 @@ def create_publisher(request):
     :rtype: HttpResponse
     """
     if request.user.role != "publisher":
-        messages.error(request, "Only users with publisher role can create publishers.")
+        messages.error(request,
+                       "Only users with publisher role can create publishers.")
         return redirect("home")
 
     # Prevent a publisher user from having multiple publishers
@@ -710,7 +728,9 @@ def publisher_list(request):
     :rtype: HttpResponse
     """
     publishers = Publisher.objects.all().order_by("-created_at")
-    return render(request, "news_app/publisher_list.html", {"publishers": publishers})
+    return render(request,
+                  "news_app/publisher_list.html",
+                  {"publishers": publishers})
 
 
 def publisher_detail(request, pk):
@@ -758,14 +778,16 @@ def request_join_publisher(request, pk):
 
     # Only journalists/editors can join
     if request.user.role not in ["journalist", "editor"]:
-        messages.error(request, "Only journalists and editors can request to join.")
+        messages.error(request,
+                       "Only journalists and editors can request to join.")
         return redirect("publisher_detail", pk=pk)
 
     # Prevent multiple active requests
     if PublisherJoinRequest.objects.filter(
         user=request.user, publisher=publisher, status="pending"
     ).exists():
-        messages.warning(request, "You already submitted a request to this publisher.")
+        messages.warning(request,
+                         "You already submitted a request to this publisher.")
         return redirect("publisher_detail", pk=pk)
 
     if request.method == "POST":
@@ -781,7 +803,10 @@ def request_join_publisher(request, pk):
         messages.success(request, "Your request has been submitted!")
         return redirect("publisher_detail", pk=pk)
 
-    return render(request, "news_app/request_join_publisher.html", {"publisher": publisher})
+    return render(request,
+                  "news_app/request_join_publisher.html",
+                  {"publisher": publisher})
+
 
 @login_required
 def publisher_join_requests(request):
@@ -838,8 +863,6 @@ def publisher_join_requests(request):
 
     return render(request, "news_app/publisher_join_requests.html", context)
 
-    
-
 
 @login_required
 def publisher_dashboard(request, pk):
@@ -859,7 +882,8 @@ def publisher_dashboard(request, pk):
 
     # Only owner OR editor can open dashboard
     if not (is_owner or is_editor):
-        messages.error(request, "You do not have permission to access this publisher dashboard.")
+        messages.error(request,
+                       "You do not have permission to access this publisher dashboard.")
         return redirect("publisher_detail", pk=pk)
 
     # Only show join requests if user is the OWNER
@@ -883,8 +907,6 @@ def publisher_dashboard(request, pk):
     }
 
     return render(request, "news_app/publisher_dashboard.html", context)
-
-
 
 
 @login_required
@@ -923,6 +945,7 @@ def approve_join_request(request, request_id):
         f"{join_req.user.username} has been added to the team."
     )
     return redirect("publisher_join_requests")
+
 
 @login_required
 def reject_join_request(request, request_id):
@@ -977,10 +1000,13 @@ def web_subscribe_to_journalist(request, journalist_id):
         messages.error(request, "Only readers may subscribe to journalists.")
         return redirect("journalist_list")
 
-    journalist = get_object_or_404(CustomUser, id=journalist_id, role="journalist")
+    journalist = get_object_or_404(CustomUser,
+                                   id=journalist_id,
+                                   role="journalist")
 
     if journalist in request.user.subscribed_journalists.all():
-        messages.info(request, f"You are already subscribed to {journalist.username}.")
+        messages.info(request,
+                      f"You are already subscribed to {journalist.username}.")
     else:
         request.user.subscribed_journalists.add(journalist)
         messages.success(request, f"Subscribed to {journalist.username}!")
@@ -1002,13 +1028,17 @@ def web_unsubscribe_from_journalist(request, journalist_id):
         messages.error(request, "Only readers may unsubscribe.")
         return redirect("journalist_list")
 
-    journalist = get_object_or_404(CustomUser, id=journalist_id, role="journalist")
+    journalist = get_object_or_404(CustomUser,
+                                   id=journalist_id,
+                                   role="journalist")
 
     if journalist not in request.user.subscribed_journalists.all():
-        messages.info(request, f"You were not subscribed to {journalist.username}.")
+        messages.info(request,
+                      f"You were not subscribed to {journalist.username}.")
     else:
         request.user.subscribed_journalists.remove(journalist)
-        messages.success(request, f"Unsubscribed from {journalist.username}.")
+        messages.success(request,
+                         f"Unsubscribed from {journalist.username}.")
 
     return redirect("journalist_list")
 
@@ -1024,16 +1054,19 @@ def subscribe_newsletter(request, newsletter_id):
     :rtype: HttpResponse
     """
     if request.user.role not in ["reader", "editor"]:
-        messages.error(request, "Only readers and editors can subscribe to newsletters.")
+        messages.error(request,
+                       "Only readers and editors can subscribe to newsletters.")
         return redirect("newsletter_detail", pk=newsletter_id)
 
     newsletter = get_object_or_404(Newsletter, id=newsletter_id)
 
     if newsletter in request.user.subscribed_newsletters.all():
-        messages.info(request, f"You are already subscribed to {newsletter.title}.")
+        messages.info(request,
+                      f"You are already subscribed to {newsletter.title}.")
     else:
         request.user.subscribed_newsletters.add(newsletter)
-        messages.success(request, f"Successfully subscribed to {newsletter.title}!")
+        messages.success(request,
+                         f"Successfully subscribed to {newsletter.title}!")
 
     return redirect("newsletter_detail", pk=newsletter_id)
 
@@ -1049,16 +1082,19 @@ def unsubscribe_newsletter(request, newsletter_id):
     :rtype: HttpResponse
     """
     if request.user.role not in ["reader", "editor"]:
-        messages.error(request, "Only readers and editors can manage newsletter subscriptions.")
+        messages.error(request,
+                       "Only readers and editors can manage newsletter subscriptions.")
         return redirect("newsletter_detail", pk=newsletter_id)
 
     newsletter = get_object_or_404(Newsletter, id=newsletter_id)
 
     if newsletter not in request.user.subscribed_newsletters.all():
-        messages.info(request, f"You are not subscribed to {newsletter.title}.")
+        messages.info(request,
+                      f"You are not subscribed to {newsletter.title}.")
     else:
         request.user.subscribed_newsletters.remove(newsletter)
-        messages.success(request, f"Successfully unsubscribed from {newsletter.title}.")
+        messages.success(request,
+                         f"Successfully unsubscribed from {newsletter.title}.")
 
     return redirect("newsletter_detail", pk=newsletter_id)
 
@@ -1094,7 +1130,9 @@ def journalist_list(request):
     :rtype: HttpResponse
     """
     journalists = CustomUser.objects.filter(role="journalist").order_by("username")
-    return render(request, "news_app/journalist_list.html", {"journalists": journalists, "title": "Journalists"})
+    return render(request,
+                  "news_app/journalist_list.html",
+                  {"journalists": journalists, "title": "Journalists"})
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
@@ -1117,7 +1155,8 @@ class ArticleViewSet(viewsets.ModelViewSet):
         """
         Return serializer class depending on action.
 
-        :returns: ArticleCreateSerializer for create action, ArticleSerializer for all other actions
+        :returns: ArticleCreateSerializer for create action,
+        ArticleSerializer for all other actions
         :rtype: class
         """
         if self.action == "create":
@@ -1128,7 +1167,8 @@ class ArticleViewSet(viewsets.ModelViewSet):
         """
         Return articles filtered by user role.
 
-        :returns: Filtered articles based on user role (Editors: All articles, Journalists: Approved + own, Others: Approved only)
+        :returns: Filtered articles based on user role
+        (Editors: All articles, Journalists: Approved + own, Others: Approved only)
         :rtype: QuerySet
         """
         user = self.request.user
@@ -1227,7 +1267,8 @@ class PublisherViewSet(viewsets.ReadOnlyModelViewSet):
         :rtype: Response
         """
         publisher = self.get_object()
-        articles = Article.objects.filter(publisher=publisher, is_approved=True).order_by("-published_date")
+        articles = Article.objects.filter(publisher=publisher,
+                                          is_approved=True).order_by("-published_date")
         page = self.paginate_queryset(articles)
         if page is not None:
             serializer = ArticleSerializer(page, many=True)
@@ -1257,7 +1298,8 @@ class JournalistArticlesView(generics.ListAPIView):
         :rtype: QuerySet
         """
         journalist_id = self.kwargs.get("journalist_id")
-        return Article.objects.filter(author_id=journalist_id, is_approved=True).order_by("-published_date")
+        return Article.objects.filter(author_id=journalist_id,
+                                      is_approved=True).order_by("-published_date")
 
 
 class SubscriptionArticlesView(generics.ListAPIView):
@@ -1277,7 +1319,8 @@ class SubscriptionArticlesView(generics.ListAPIView):
         """
         Get queryset of articles from user's subscriptions.
 
-        :returns: Approved articles from subscribed publishers and journalists, ordered by publication date. Returns empty queryset if user is not a reader
+        :returns: Approved articles from subscribed publishers and journalists,
+        ordered by publication date. Returns empty queryset if user is not a reader
         :rtype: QuerySet
         """
         user = self.request.user
@@ -1310,15 +1353,18 @@ def subscribe_to_publisher(request, publisher_id):
     :rtype: Response
     """
     if request.user.role != "reader":
-        return Response({"error": "Only readers can subscribe to publishers"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"error": "Only readers can subscribe to publishers"},
+                        status=status.HTTP_403_FORBIDDEN)
 
     publisher = get_object_or_404(Publisher, id=publisher_id)
     if publisher in request.user.subscribed_publishers.all():
-        return Response({"message": f"Already subscribed to {publisher.name}"}, status=status.HTTP_200_OK)
+        return Response({"message": f"Already subscribed to {publisher.name}"},
+                        status=status.HTTP_200_OK)
 
     request.user.subscribed_publishers.add(publisher)
     return Response(
-        {"message": f"Successfully subscribed to {publisher.name}", "publisher": {"id": publisher.id, "name": publisher.name}},
+        {"message": f"Successfully subscribed to {publisher.name}",
+         "publisher": {"id": publisher.id, "name": publisher.name}},
         status=status.HTTP_201_CREATED,
     )
 
@@ -1337,14 +1383,17 @@ def unsubscribe_from_publisher(request, publisher_id):
     :rtype: Response
     """
     if request.user.role != "reader":
-        return Response({"error": "Only readers can manage subscriptions"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"error": "Only readers can manage subscriptions"},
+                        status=status.HTTP_403_FORBIDDEN)
 
     publisher = get_object_or_404(Publisher, id=publisher_id)
     if publisher not in request.user.subscribed_publishers.all():
-        return Response({"message": f"Not subscribed to {publisher.name}"}, status=status.HTTP_200_OK)
+        return Response({"message": f"Not subscribed to {publisher.name}"},
+                        status=status.HTTP_200_OK)
 
     request.user.subscribed_publishers.remove(publisher)
-    return Response({"message": f"Successfully unsubscribed from {publisher.name}"}, status=status.HTTP_200_OK)
+    return Response({"message": f"Successfully unsubscribed from {publisher.name}"},
+                    status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -1367,7 +1416,8 @@ def subscribe_to_journalist(request, journalist_id):
     journalist = get_object_or_404(CustomUser, id=journalist_id,
                                    role="journalist")
     if journalist in request.user.subscribed_journalists.all():
-        return Response({"message": f"Already subscribed to {journalist.username}"}, status=status.HTTP_200_OK)
+        return Response({"message": f"Already subscribed to {journalist.username}"},
+                        status=status.HTTP_200_OK)
 
     request.user.subscribed_journalists.add(journalist)
     return Response(
@@ -1391,14 +1441,18 @@ def unsubscribe_from_journalist(request, journalist_id):
     :rtype: Response
     """
     if request.user.role != "reader":
-        return Response({"error": "Only readers can manage subscriptions"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"error": "Only readers can manage subscriptions"},
+                        status=status.HTTP_403_FORBIDDEN)
 
-    journalist = get_object_or_404(CustomUser, id=journalist_id, role="journalist")
+    journalist = get_object_or_404(CustomUser,
+                                   id=journalist_id, role="journalist")
     if journalist not in request.user.subscribed_journalists.all():
-        return Response({"message": f"Not subscribed to {journalist.username}"}, status=status.HTTP_200_OK)
+        return Response({"message": f"Not subscribed to {journalist.username}"},
+                        status=status.HTTP_200_OK)
 
     request.user.subscribed_journalists.remove(journalist)
-    return Response({"message": f"Successfully unsubscribed from {journalist.username}"}, status=status.HTTP_200_OK)
+    return Response({"message": f"Successfully unsubscribed from {journalist.username}"},
+                    status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -1416,7 +1470,8 @@ def my_subscriptions(request):
     :rtype: Response
     """
     if request.user.role != "reader":
-        return Response({"error": "Only readers have subscriptions"}, status=status.HTTP_403_FORBIDDEN)
+        return Response({"error": "Only readers have subscriptions"},
+                        status=status.HTTP_403_FORBIDDEN)
 
     publishers = request.user.subscribed_publishers.all()
     journalists = request.user.subscribed_journalists.all()
@@ -1424,11 +1479,17 @@ def my_subscriptions(request):
     return Response(
         {
             "publishers": [
-                {"id": p.id, "name": p.name, "description": p.description, "website": p.website}
+                {"id": p.id,
+                 "name": p.name,
+                 "description": p.description,
+                 "website": p.website}
                 for p in publishers
             ],
             "journalists": [
-                {"id": j.id, "username": j.username, "email": j.email, "full_name": j.get_full_name()}
+                {"id": j.id,
+                 "username": j.username,
+                 "email": j.email,
+                 "full_name": j.get_full_name()}
                 for j in journalists
             ],
         }
