@@ -1,0 +1,141 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Edit{% else %}Create{% endif %} Publisher - News App{% endblock %}
+
+<link rel="stylesheet" href="{% static 'news_app/forms.css' %}">
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+    <div class="form-hero">
+        <div class="form-icon">🏢</div>
+        <h1 class="form-title">
+            {% if form.instance.pk %}
+                Edit Publisher
+            {% else %}
+                Create Publisher
+            {% endif %}
+        </h1>
+        <p class="form-subtitle">
+            {% if form.instance.pk %}
+                Update your publisher information
+            {% else %}
+                Set up your new publishing organization
+            {% endif %}
+        </p>
+    </div>
+    
+    {% if not form.instance.pk %}
+    <div class="form-info">
+        <h4>💡 Getting Started</h4>
+        <ul>
+            <li>Fill in your publisher details to create your organization</li>
+            <li>You can add team members and create newsletters after setup</li>
+            <li>Your publisher profile will be visible to all users</li>
+            <li>You can edit these details anytime from your dashboard</li>
+        </ul>
+    </div>
+    {% endif %}
+    
+    <div class="form-container">
+        {% if form.errors %}
+        <div class="form-errors">
+            <strong>⚠️ Please correct the errors below:</strong>
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="form-section">
+                <h3>📋 Basic Information</h3>
+                
+                <div class="form-group">
+                    <label for="{{ form.name.id_for_label }}" class="required-field">
+                        Publisher Name
+                    </label>
+                    {{ form.name }}
+                    {% if form.name.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.name.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <span class="help-text">The official name of your publishing organization</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="{{ form.description.id_for_label }}" class="required-field">
+                        Description
+                    </label>
+                    {{ form.description }}
+                    {% if form.description.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.description.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <span class="help-text">Tell readers about your publisher's mission and focus</span>
+                </div>
+            </div>
+            
+            {% if form.website %}
+            <div class="form-section">
+                <h3>🌐 Additional Information</h3>
+                
+                <div class="form-group">
+                    <label for="{{ form.website.id_for_label }}">
+                        Website
+                    </label>
+                    {{ form.website }}
+                    {% if form.website.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.website.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <span class="help-text">Your publisher's website URL (optional)</span>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="action-buttons">
+                <a href="{% if form.instance.pk %}{% url 'publisher_detail' form.instance.pk %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-secondary">
+                    ← Cancel
+                </a>
+                <button type="submit" class="btn-submit">
+                    {% if form.instance.pk %}
+                        💾 Save Changes
+                    {% else %}
+                        ✨ Create Publisher
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+    
+    {% if form.instance.pk %}
+    <div style="text-align: center; color: #999; font-size: 0.9em; margin-top: 20px;">
+        <p>Created {{ form.instance.created_at|date:"F d, Y" }}</p>
+    </div>
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-resize textarea
+    document.querySelectorAll('textarea').forEach(textarea => {
+        textarea.style.height = 'auto';
+        textarea.style.height = textarea.scrollHeight + 'px';
+        
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    });
+</script>
+{% endblock %}

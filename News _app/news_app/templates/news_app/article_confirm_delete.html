@@ -1,0 +1,36 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Delete Article - News App{% endblock %}
+
+<link rel="stylesheet" href="{% static 'news_app/articles.css' %}">
+{% block extra_css %}{% endblock %}
+
+{% block content %}
+    <div class="confirm-hero">
+        <div class="confirm-icon">⚠️</div>
+        <h1 class="confirm-title">Delete Article?</h1>
+        <p style="color: #666; font-size: 1.1em;">This action cannot be undone</p>
+    </div>
+    
+    <div class="confirm-warning">
+        <h3>🚨 Warning</h3>
+        <p><strong>You are about to permanently delete this article.</strong></p>
+        <p>This will remove:</p>
+        <ul style="color: #666; line-height: 1.8; margin-left: 20px; margin-top: 10px;">
+            <li>The article and all its content</li>
+            <li>All associated metadata and images</li>
+            <li>Any references to this article</li>
+        </ul>
+        <p style="margin-top: 15px;"><strong>This action is permanent and cannot be reversed.</strong></p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="action-buttons">
+            <button type="submit" class="btn-danger-confirm">
+                🗑️ Yes, Delete Article
+            </button>
+        </div>
+    </form>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Publishers - News App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'news_app/publishers.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="hero-section">
+        <h1 class="hero-title">🏢 Browse Publishers</h1>
+        <p class="hero-subtitle">Subscribe to publishers to receive their latest articles</p>
+    </div>
+    
+    {% if publishers %}
+        <div class="publisher-grid">
+            {% for publisher in publishers %}
+            <div class="publisher-card" onclick="event.target.tagName === 'DIV' && window.location.href='{% url 'publisher_detail' publisher.pk %}'">
+                <div class="publisher-header">
+                    🏢
+                </div>
+                
+                <div class="publisher-content">
+                    <h3 class="publisher-name">{{ publisher.name }}</h3>
+                    
+                    {% if publisher.description %}
+                    <p class="publisher-description">{{ publisher.description }}</p>
+                    {% endif %}
+                    
+                    <div class="publisher-stats">
+                        <span class="stat-badge">
+                            👥 {{ publisher.subscriber_count|default:0 }} subscriber{{ publisher.subscriber_count|default:0|pluralize }}
+                        </span>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        {% if user.is_authenticated and user.role in "reader,editor" %}
+                        {% elif not user.is_authenticated %}
+                            <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">
+                                Login to Subscribe
+                            </a>
+                        {% endif %}
+                        
+                        <a href="{% url 'publisher_detail' publisher.pk %}" class="btn btn-primary btn-sm">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">🏢</div>
+            <h3>No Publishers Found</h3>
+            <p>Check back later for new publishers!</p>
+        </div>
+    {% endif %}
+{% endblock %}

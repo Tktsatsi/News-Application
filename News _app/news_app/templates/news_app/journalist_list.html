@@ -1,0 +1,62 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Journalists - News App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'news_app/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="hero-section">
+        <h1 class="hero-title">👥 Browse Journalists</h1>
+        <p class="hero-subtitle">Subscribe to journalists to stay updated with their articles and newsletters</p>
+    </div>
+    
+    {% if journalists %}
+        <div class="journalist-grid">
+            {% for journalist in journalists %}
+            <div class="journalist-card">
+                <div class="journalist-header">
+                    ✍️
+                </div>
+                
+                <div class="journalist-content">
+                    <h3 class="journalist-name">{{ journalist.get_full_name|default:journalist.username }}</h3>
+                    <p class="journalist-username">@{{ journalist.username }}</p>
+                    
+                    <div class="journalist-stats">
+                        <span class="stat-badge">
+                            👥 {{ journalist.subscriber_count }} subscriber{{ journalist.subscriber_count|pluralize }}
+                        </span>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        {% if user.is_authenticated and user.role in "reader,editor" and user != journalist %}
+                            {% if journalist in user.subscribed_journalists.all %}
+                                <a href="{% url 'web_unsubscribe_journalist' journalist.id %}" class="btn btn-danger btn-sm">
+                                    Unsubscribe
+                                </a>
+                            {% else %}
+                                <a href="{% url 'web_subscribe_journalist' journalist.id %}" class="btn btn-primary btn-sm">
+                                    Subscribe
+                                </a>
+                            {% endif %}
+                        {% elif not user.is_authenticated %}
+                            <a href="{% url 'login' %}" class="btn btn-secondary btn-sm">
+                                Login to Subscribe
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <h3>No Journalists Found</h3>
+            <p>Check back later for new journalists to follow!</p>
+        </div>
+    {% endif %}
+{% endblock %}

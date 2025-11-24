@@ -1,0 +1,192 @@
+{% extends 'news_app/base.html' %}
+{% load static %}
+
+{% block title %}Publisher Dashboard - News App{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'news_app/publishers.css' %}">
+<link rel="stylesheet" href="{% static 'news_app/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="dashboard-hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>🏢 {{ publisher.name }}</h1>
+                <p>Publisher Dashboard</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📰</div>
+            <div class="stat-number">{{ articles.count }}</div>
+            <div class="stat-label">Total Articles</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">📧</div>
+            <div class="stat-number">{{ newsletters.count }}</div>
+            <div class="stat-label">Newsletters</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">👥</div>
+            <div class="stat-number">{{ members.count }}</div>
+            <div class="stat-label">Team Members</div>
+        </div>
+        
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-number">{{ approved_articles }}</div>
+            <div class="stat-label">Approved Articles</div>
+        </div>
+    </div>
+    
+    <div class="section-header">
+        <h2 class="section-title">Recent Articles</h2>
+    </div>
+    
+    {% if articles %}
+        <div class="content-grid">
+            {% for article in articles|slice:":6" %}
+            <div class="content-card" onclick="window.location.href='{% url 'article_detail' article.pk %}'">
+                <div class="card-header">
+                    <div class="article-title-header">
+                        <h3 class="card-title">{{ article.title|truncatewords:8 }}</h3>
+                        <span class="status-badge status-{{ article.status }}">
+                            {{ article.get_status_display }}
+                        </span>
+                    </div>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            👤 {{ article.author.username }}
+                        </div>
+                        <div class="meta-item">
+                            📅 {{ article.published_date|date:"M d" }}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    {% if article.summary %}
+                    <p class="card-description">{{ article.summary|truncatewords:15 }}</p>
+                    {% endif %}
+                    <div class="card-actions">
+                        <a href="{% url 'article_detail' article.pk %}" class="btn btn-secondary btn-sm" onclick="event.stopPropagation()">
+                            👁️ View
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📰</div>
+            <h3>No Articles Yet</h3>
+        </div>
+    {% endif %}
+    
+    <div class="section-header" style="margin-top: 40px;">
+        <h2 class="section-title">Newsletters</h2>
+    </div>
+    
+    {% if newsletters %}
+        <div class="content-grid">
+            {% for newsletter in newsletters %}
+            <div class="content-card" onclick="window.location.href='{% url 'newsletter_detail' newsletter.pk %}'">
+                <div class="card-header">
+                    <h3 class="card-title">📧 {{ newsletter.title }}</h3>
+                    <div class="card-meta">
+                        <div class="meta-item">
+                            👥 {{ newsletter.subscribers.count }} subscribers
+                        </div>
+                        <div class="meta-item">
+                            📅 {{ newsletter.created_at|date:"M d, Y" }}
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <p class="card-description">{{ newsletter.description|truncatewords:15 }}</p>
+                    <div class="card-actions">
+                        <a href="{% url 'newsletter_detail' newsletter.pk %}" class="btn btn-secondary btn-sm" onclick="event.stopPropagation()">
+                            👁️ View
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📧</div>
+            <h3>No Newsletters Yet</h3>
+        </div>
+    {% endif %}
+
+    <div class="section-header" style="margin-top: 40px;">
+        <h2 class="section-title">Join Requests</h2>
+        {% if is_owner %}
+        <a href="{% url 'publisher_join_requests' %}" class="btn btn-primary btn-sm">
+            📥 View All Requests
+        </a>
+        {% endif %}
+    </div>
+
+    {% if pending_requests %}
+        {% for req in pending_requests %}
+        <div class="team-member-card pending-request-card">
+            <div class="member-avatar">
+                {{ req.user.username|slice:":1"|upper }}
+            </div>
+
+            <div class="member-info">
+                <div class="member-name">{{ req.user.username }}</div>
+                <div class="member-role">{{ req.user.get_role_display }}</div>
+                <p class="request-message-text">{{ req.message }}</p>
+            </div>
+
+            <div class="request-actions">
+                <a href="{% url 'approve_join_request' req.pk %}" class="btn btn-success btn-sm">
+                    ✔ Approve
+                </a>
+                <a href="{% url 'reject_join_request' req.pk %}" class="btn btn-danger btn-sm">
+                    ✖ Reject
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">📩</div>
+            <h3>No Join Requests</h3>
+            <p>New join requests will appear here for approval.</p>
+        </div>
+    {% endif %}
+
+    <div class="section-header" style="margin-top: 40px;">
+        <h2 class="section-title">Team Members</h2>
+    </div>
+    
+    {% if members %}
+        {% for member in members %}
+        <div class="team-member-card">
+            <div class="member-avatar">
+                {{ member.username|slice:":1"|upper }}
+            </div>
+            <div class="member-info">
+                <div class="member-name">{{ member.username }}</div>
+                <div class="member-role">{{ member.get_role_display }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">👥</div>
+            <h3>No Team Members Yet</h3>
+            <p>Journalists can request to join your publisher</p>
+        </div>
+    {% endif %}
+    
+{% endblock %}
