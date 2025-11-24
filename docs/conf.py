@@ -9,8 +9,14 @@ import os
 import sys
 import django
 
-sys.path.insert(0, os.path.abspath(".."))
-os.environ["DJANGO_SETTINGS_MODULE"] = "News_app.settings"
+BASE_DIR = os.path.abspath("..")
+sys.path.insert(0, BASE_DIR)
+
+# Path to the Django project folder (News_app)
+DJANGO_PROJECT_DIR = os.path.abspath("../News_app")
+sys.path.insert(0, DJANGO_PROJECT_DIR)
+
+os.environ["DJANGO_SETTINGS_MODULE"] = "news_project.settings"
 django.setup()
 
 project = 'News-application'
@@ -33,5 +39,5 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx-rtd-theme'
+html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
