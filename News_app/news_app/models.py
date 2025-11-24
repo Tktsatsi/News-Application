@@ -230,7 +230,8 @@ class CustomUser(AbstractUser):
                 self.subscribed_newsletters.exists()
                 or self.subscribed_journalists.exists()
             ):
-                raise ValidationError("Journalists cannot have reader subscriptions.")
+                raise ValidationError(
+                    "Journalists cannot have reader subscriptions.")
 
 
 class Article(models.Model):

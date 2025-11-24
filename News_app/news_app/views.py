@@ -243,7 +243,8 @@ def delete_article(request, pk):
 
     if article.is_approved:
         messages.error(request,
-                       "Cannot delete approved articles. Please contact an editor.")
+                       "Cannot delete approved articles."
+                       " Please contact an editor.")
         return redirect("my_articles")
 
     if request.method == "POST":
@@ -651,11 +652,13 @@ def dashboard(request):
 
     if user.role == "reader":
         context["subscribed_newsletters"] = user.subscribed_newsletters.all()
-        context["latest_articles"] = Article.objects.filter(is_approved=True).order_by(
-            "-published_date"
-        )[:5]
+        context["latest_articles"] = (
+            Article.objects.filter(is_approved=True).order_by(
+                "-published_date"
+                )[:5])
     elif user.role == "editor":
-        context["pending_count"] = Article.objects.filter(is_approved=False).count()
+        context["pending_count"] = (
+            Article.objects.filter(is_approved=False).count())
         context["approved_count"] = Article.objects.filter(
             is_approved=True, approved_by=user
         ).count()
