@@ -45,7 +45,8 @@ class ArticleAPITest(APITestCase):
 
     def test_list_articles_authenticated(self):
         """Test authenticated users can list articles."""
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.reader_token.key}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {self.reader_token.key}")
         url = reverse("api-article-list")
         response = self.client.get(url)
 
@@ -61,7 +62,8 @@ class ArticleAPITest(APITestCase):
 
     def test_create_article_as_journalist(self):
         """Test journalists can create articles."""
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.journalist_token.key}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {self.journalist_token.key}")
         url = reverse("api-article-list")
         data = {
             "title": "New Article",
@@ -76,7 +78,8 @@ class ArticleAPITest(APITestCase):
 
     def test_create_article_as_reader_fails(self):
         """Test readers cannot create articles."""
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.reader_token.key}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {self.reader_token.key}")
         url = reverse("api-article-list")
         data = {
             "title": "New Article",
@@ -90,7 +93,8 @@ class ArticleAPITest(APITestCase):
 
     def test_update_article_as_editor(self):
         """Test editors can update articles."""
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.editor_token.key}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {self.editor_token.key}")
         url = reverse("api-article-detail", args=[self.approved_article.id])
         data = {
             "title": "Updated Title",
@@ -106,7 +110,8 @@ class ArticleAPITest(APITestCase):
 
     def test_delete_article_as_editor(self):
         """Test editors can delete articles."""
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.editor_token.key}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {self.editor_token.key}")
         url = reverse("api-article-detail", args=[self.approved_article.id])
         response = self.client.delete(url)
 
@@ -251,7 +256,8 @@ class SubscriptionArticlesAPITest(APITestCase):
     def test_subscription_articles_non_reader_role(self):
         """Test non-reader roles get empty results."""
         journalist_token = Token.objects.create(user=self.journalist1)
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {journalist_token.key}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {journalist_token.key}")
         url = reverse("subscription-articles")
         response = self.client.get(url)
 
@@ -299,7 +305,8 @@ class NewsletterAPITest(APITestCase):
 
     def test_list_newsletters(self):
         """Test listing newsletters."""
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.journalist_token.key}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {self.journalist_token.key}")
         url = reverse("api-newsletter-list")
         response = self.client.get(url)
 
@@ -308,7 +315,8 @@ class NewsletterAPITest(APITestCase):
 
     def test_create_newsletter_as_journalist(self):
         """Test journalists can create newsletters."""
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.journalist_token.key}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Token {self.journalist_token.key}")
         url = reverse("api-newsletter-list")
         data = {
             "title": "New Newsletter",
