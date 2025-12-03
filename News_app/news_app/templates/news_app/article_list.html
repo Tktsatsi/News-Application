@@ -16,44 +16,48 @@
     {% if articles %}
         <div class="article-grid">
             {% for article in articles %}
-            <div class="article-card" onclick="window.location.href='{% url 'article_detail' article.pk %}'">
-                {% if article.image %}
-                <div class="article-image">
-                    <img src="{{ article.image.url }}" alt="{{ article.title }}">
-                </div>
-                {% else %}
-                <div class="article-placeholder">
-                    📰
-                </div>
-                {% endif %}
-                
+            <div class="article-card" {% if user.is_authenticated %}onclick="window.location.href='{% url 'article_detail' article.pk %}'"{% endif %}>
                 <div class="article-content">
                     <h3 class="article-title">{{ article.title }}</h3>
-                    
-                    <div class="article-meta">
-                        <div class="meta-item">
-                            <span>By</span>
-                            <span class="article-author">{{ article.author.get_full_name|default:article.author.username }}</span>
+
+                    {% if user.is_authenticated %}
+                        {% if article.image %}
+                        <div class="article-image">
+                            <img src="{{ article.image.url }}" alt="{{ article.title }}">
                         </div>
-                        <div class="meta-item">
-                            📅 {{ article.published_date|date:"M d, Y" }}
-                        </div>
-                        {% if article.publisher %}
-                        <div class="meta-item">
-                            🏢 {{ article.publisher.name }}
+                        {% else %}
+                        <div class="article-placeholder">
+                            📰
                         </div>
                         {% endif %}
-                    </div>
-                    
-                    {% if article.summary %}
-                    <p class="article-summary">{{ article.summary }}</p>
+
+                        <div class="article-meta">
+                            <div class="meta-item">
+                                <span>By</span>
+                                <span class="article-author">{{ article.author.get_full_name|default:article.author.username }}</span>
+                            </div>
+                            <div class="meta-item">
+                                📅 {{ article.published_date|date:"M d, Y" }}
+                            </div>
+                            {% if article.publisher %}
+                            <div class="meta-item">
+                                🏢 {{ article.publisher.name }}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        {% if article.summary %}
+                        <p class="article-summary">{{ article.summary }}</p>
+                        {% else %}
+                        <p class="article-summary">{{ article.content|truncatewords:30 }}</p>
+                        {% endif %}
+
+                        <a href="{% url 'article_detail' article.pk %}" class="read-more">
+                            Read More →
+                        </a>
                     {% else %}
-                    <p class="article-summary">{{ article.content|truncatewords:30 }}</p>
+                        {# Anonymous users see only the title. #}
                     {% endif %}
-                    
-                    <a href="{% url 'article_detail' article.pk %}" class="read-more">
-                        Read More →
-                    </a>
                 </div>
             </div>
             {% endfor %}

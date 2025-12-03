@@ -22,6 +22,7 @@ class NewsAppConfig(AppConfig):
         Import signal handlers when the app is ready.
 
         This method is called when Django starts and ensures that
-        signal handlers are registered. Currently, signals are imported
-        automatically via Django's signal discovery.
+        signal handlers are registered.
         """
+        # Explicitly import signal handlers to ensure they are registered
+        from . import signals  # noqa: F401

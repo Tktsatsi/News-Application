@@ -99,7 +99,7 @@ def send_email_notifications(article):
 
     # Get subscribers to the publisher
     if article.publisher:
-        publisher_subscribers = article.publisher.subscribers.all()
+        publisher_subscribers = article.publisher.subscribed_readers.all()
         subscribers.update(publisher_subscribers)
 
     # Get subscribers to the journalist/author

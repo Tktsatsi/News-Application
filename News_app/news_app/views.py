@@ -432,7 +432,7 @@ class NewsletterListView(ListView):
         )
 
 
-class NewsletterDetailView(DetailView):
+class NewsletterDetailView(LoginRequiredMixin, DetailView):
     """
     Display detailed view of a single newsletter.
 
@@ -491,7 +491,7 @@ class ArticleListView(ListView):
         )
 
 
-class ArticleDetailView(DetailView):
+class ArticleDetailView(LoginRequiredMixin, DetailView):
     """
     Display detailed view of a single article.
 
@@ -707,9 +707,15 @@ def create_publisher(request):
             publisher.owner = request.user
             publisher.save()
 
+            # Add the creator as an editor so they can manage the publisher
+            publisher.editors.add(request.user)
+
             messages.success(
                 request,
-                f'Publisher "{publisher.name}" created successfully! You are now the owner.'
+                (
+                    f'Publisher "{publisher.name}" created successfully! '
+                    "You are now the owner."
+                ),
             )
             return redirect("publisher_dashboard", pk=publisher.pk)
     else:
@@ -757,10 +763,14 @@ def publisher_detail(request, pk):
 
     if request.user.is_authenticated:
         if request.user.role == "journalist":
-            is_member = publisher.journalists.filter(pk=request.user.pk).exists()
+            is_member = (
+                publisher.journalists.filter(pk=request.user.pk).exists()
+            )
             can_request_join = not is_member
         elif request.user.role == "editor":
-            is_member = publisher.editors.filter(pk=request.user.pk).exists()
+            is_member = (
+                publisher.editors.filter(pk=request.user.pk).exists()
+            )
             can_request_join = not is_member
 
     context = {
@@ -795,7 +805,6 @@ def request_join_publisher(request, pk):
 
     if request.method == "POST":
         message = request.POST.get("message")
-        portfolio = request.POST.get("portfolio")
 
         PublisherJoinRequest.objects.create(
             user=request.user,
@@ -885,8 +894,13 @@ def publisher_dashboard(request, pk):
 
     # Only owner OR editor can open dashboard
     if not (is_owner or is_editor):
-        messages.error(request,
-                       "You do not have permission to access this publisher dashboard.")
+        messages.error(
+            request,
+            (
+                "You do not have permission to access "
+                "this publisher dashboard."
+            ),
+        )
         return redirect("publisher_detail", pk=pk)
 
     # Only show join requests if user is the OWNER
@@ -924,20 +938,23 @@ def approve_join_request(request, request_id):
     """
     join_req = get_object_or_404(PublisherJoinRequest, id=request_id)
 
-    # Only the publisher owner can approve
-    if request.user != join_req.publisher.owner:
+    # Only the publisher owner or existing editors can approve
+    is_owner = (request.user == join_req.publisher.owner)
+    is_editor = join_req.publisher.editors.filter(pk=request.user.pk).exists()
+    if not (is_owner or is_editor):
         messages.error(
             request,
             "You are not allowed to approve this request."
         )
         return redirect("publisher_dashboard", pk=join_req.publisher.pk)
 
-    # Update join request
+    # Update join request status and metadata
     join_req.status = "approved"
     join_req.reviewed_by = request.user
     join_req.reviewed_at = timezone.now()
-    join_req.save()
+    join_req.save()  # Persist status change to database
 
+    # Add the user to the appropriate publisher team
     if join_req.user.role == "journalist":
         join_req.publisher.journalists.add(join_req.user)
     elif join_req.user.role == "editor":
@@ -962,30 +979,26 @@ def reject_join_request(request, request_id):
     """
     join_req = get_object_or_404(PublisherJoinRequest, id=request_id)
 
-    if request.user != join_req.publisher.owner:
+    # Only the publisher owner or existing editors can reject
+    is_owner = (request.user == join_req.publisher.owner)
+    is_editor = join_req.publisher.editors.filter(pk=request.user.pk).exists()
+    if not (is_owner or is_editor):
         messages.error(
             request,
-            "You are not allowed to approve this request."
+            "You are not allowed to reject this request."
         )
         return redirect("publisher_dashboard", pk=join_req.publisher.pk)
 
+    # Update join request status and metadata
     join_req.status = "rejected"
     join_req.reviewed_by = request.user
     join_req.reviewed_at = timezone.now()
-    join_req.save()
+    join_req.save()  # Persist status change to database
 
     messages.success(
         request,
         f"Join request from {join_req.user.username} has been rejected."
     )
-    return redirect("publisher_join_requests")
-
-    if join_req.user.role == "journalist":
-        join_req.publisher.journalists.add(join_req.user)
-    elif join_req.user.role == "editor":
-        join_req.publisher.editors.add(join_req.user)
-
-    messages.info(request, f"{join_req.user.username}'s request was rejected.")
     return redirect("publisher_join_requests")
 
 
@@ -1057,8 +1070,10 @@ def subscribe_newsletter(request, newsletter_id):
     :rtype: HttpResponse
     """
     if request.user.role not in ["reader", "editor"]:
-        messages.error(request,
-                       "Only readers and editors can subscribe to newsletters.")
+        messages.error(
+            request,
+            ("Only readers and editors can subscribe to newsletters."),
+        )
         return redirect("newsletter_detail", pk=newsletter_id)
 
     newsletter = get_object_or_404(Newsletter, id=newsletter_id)
@@ -1085,8 +1100,13 @@ def unsubscribe_newsletter(request, newsletter_id):
     :rtype: HttpResponse
     """
     if request.user.role not in ["reader", "editor"]:
-        messages.error(request,
-                       "Only readers and editors can manage newsletter subscriptions.")
+        messages.error(
+            request,
+            (
+                "Only readers and editors can manage "
+                "newsletter subscriptions."
+            ),
+        )
         return redirect("newsletter_detail", pk=newsletter_id)
 
     newsletter = get_object_or_404(Newsletter, id=newsletter_id)
@@ -1132,10 +1152,15 @@ def journalist_list(request):
     :returns: Rendered journalist list page.
     :rtype: HttpResponse
     """
-    journalists = CustomUser.objects.filter(role="journalist").order_by("username")
-    return render(request,
-                  "news_app/journalist_list.html",
-                  {"journalists": journalists, "title": "Journalists"})
+    journalists = CustomUser.objects.filter(
+        role="journalist"
+    ).order_by("username")
+
+    return render(
+        request,
+        "news_app/journalist_list.html",
+        {"journalists": journalists, "title": "Journalists"},
+    )
 
 
 class ArticleViewSet(viewsets.ModelViewSet):
@@ -1218,7 +1243,8 @@ class NewsletterViewSet(viewsets.ModelViewSet):
         """
         Return serializer class depending on action.
 
-        :returns: NewsletterCreateSerializer for create action, NewsletterSerializer for all other actions
+        :returns: NewsletterCreateSerializer for create action,
+        NewsletterSerializer for all other actions
         :rtype: class
         """
         if self.action == "create":
@@ -1229,7 +1255,8 @@ class NewsletterViewSet(viewsets.ModelViewSet):
         """
         Return permission instances for actions.
 
-        :returns: Permission classes based on action (create: IsJournalist, update/delete: IsEditor, other: IsAuthenticated)
+        :returns: Permission classes based on action
+        (create: IsJournalist, update/delete: IsEditor, other: IsAuthenticated)
         :rtype: list
         """
         if self.action == "create":
@@ -1297,7 +1324,8 @@ class JournalistArticlesView(generics.ListAPIView):
         """
         Get queryset of approved articles by journalist.
 
-        :returns: Approved articles by the specified journalist, ordered by publication date (newest first)
+        :returns: Approved articles by the specified journalist,
+        ordered by publication date (newest first)
         :rtype: QuerySet
         """
         journalist_id = self.kwargs.get("journalist_id")
@@ -1361,13 +1389,17 @@ def subscribe_to_publisher(request, publisher_id):
 
     publisher = get_object_or_404(Publisher, id=publisher_id)
     if publisher in request.user.subscribed_publishers.all():
-        return Response({"message": f"Already subscribed to {publisher.name}"},
-                        status=status.HTTP_200_OK)
+        return Response(
+            {"message": f"Already subscribed to {publisher.name}"},
+            status=status.HTTP_200_OK,
+        )
 
     request.user.subscribed_publishers.add(publisher)
     return Response(
-        {"message": f"Successfully subscribed to {publisher.name}",
-         "publisher": {"id": publisher.id, "name": publisher.name}},
+        {
+            "message": f"Successfully subscribed to {publisher.name}",
+            "publisher": {"id": publisher.id, "name": publisher.name},
+        },
         status=status.HTTP_201_CREATED,
     )
 
@@ -1391,12 +1423,16 @@ def unsubscribe_from_publisher(request, publisher_id):
 
     publisher = get_object_or_404(Publisher, id=publisher_id)
     if publisher not in request.user.subscribed_publishers.all():
-        return Response({"message": f"Not subscribed to {publisher.name}"},
-                        status=status.HTTP_200_OK)
+        return Response(
+            {"message": f"Not subscribed to {publisher.name}"},
+            status=status.HTTP_200_OK,
+        )
 
     request.user.subscribed_publishers.remove(publisher)
-    return Response({"message": f"Successfully unsubscribed from {publisher.name}"},
-                    status=status.HTTP_200_OK)
+    return Response(
+        {"message": f"Successfully unsubscribed from {publisher.name}"},
+        status=status.HTTP_200_OK,
+    )
 
 
 @api_view(["POST"])
@@ -1419,13 +1455,20 @@ def subscribe_to_journalist(request, journalist_id):
     journalist = get_object_or_404(CustomUser, id=journalist_id,
                                    role="journalist")
     if journalist in request.user.subscribed_journalists.all():
-        return Response({"message": f"Already subscribed to {journalist.username}"},
-                        status=status.HTTP_200_OK)
+        return Response(
+            {"message": f"Already subscribed to {journalist.username}"},
+            status=status.HTTP_200_OK,
+        )
 
     request.user.subscribed_journalists.add(journalist)
     return Response(
-        {"message": f"Successfully subscribed to {journalist.username}",
-         "journalist": {"id": journalist.id, "username": journalist.username}},
+        {
+            "message": f"Successfully subscribed to {journalist.username}",
+            "journalist": {
+                "id": journalist.id,
+                "username": journalist.username,
+            },
+        },
         status=status.HTTP_201_CREATED,
     )
 
@@ -1450,12 +1493,16 @@ def unsubscribe_from_journalist(request, journalist_id):
     journalist = get_object_or_404(CustomUser,
                                    id=journalist_id, role="journalist")
     if journalist not in request.user.subscribed_journalists.all():
-        return Response({"message": f"Not subscribed to {journalist.username}"},
-                        status=status.HTTP_200_OK)
+        return Response(
+            {"message": f"Not subscribed to {journalist.username}"},
+            status=status.HTTP_200_OK,
+        )
 
     request.user.subscribed_journalists.remove(journalist)
-    return Response({"message": f"Successfully unsubscribed from {journalist.username}"},
-                    status=status.HTTP_200_OK)
+    return Response(
+        {"message": f"Successfully unsubscribed from {journalist.username}"},
+        status=status.HTTP_200_OK,
+    )
 
 
 @api_view(["GET"])
@@ -1469,7 +1516,8 @@ def my_subscriptions(request):
 
     :param request: HTTP request object
     :type request: HttpRequest
-    :returns: JSON response with lists of subscribed publishers and journalists, or error if user is not a reader
+    :returns: JSON response with lists of subscribed publishers and
+        journalists, or error if user is not a reader
     :rtype: Response
     """
     if request.user.role != "reader":
