@@ -1,0 +1,423 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>news_app.management.commands.setup_data &mdash; News-application 00.00.01 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=d7bb8d4d"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            News-application
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../modules.html">News_app</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">News-application</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">news_app.management.commands.setup_data</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for news_app.management.commands.setup_data</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Setup script to initialize the news application with test data.</span>
+
+<span class="sd">This script creates sample users, publishers, and articles for testing.</span>
+<span class="sd">Run with: python manage.py shell &lt; setup_data.py</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">django</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">django.apps</span><span class="w"> </span><span class="kn">import</span> <span class="n">apps</span>
+
+<span class="c1"># Add your project directory to the path</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+    <span class="sa">r</span><span class="s2">&quot;C:\Users\Tsatsi\Documents\Hyperion Dev\M06\News application\news_project&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Set the Django settings module</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">&quot;DJANGO_SETTINGS_MODULE&quot;</span><span class="p">,</span> <span class="s2">&quot;news_project.settings&quot;</span><span class="p">)</span>
+
+<span class="c1"># Setup Django</span>
+<span class="n">django</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+<span class="c1"># NOW import Django models (move your existing imports below this line)</span>
+
+<span class="c1"># Dynamically resolve models to avoid static analysis import errors</span>
+<span class="c1"># and ensure models are resolved at runtime within Django&#39;s context.</span>
+<span class="n">Article</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;news_app&quot;</span><span class="p">,</span> <span class="s2">&quot;Article&quot;</span><span class="p">)</span>
+<span class="n">CustomUser</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;news_app&quot;</span><span class="p">,</span> <span class="s2">&quot;CustomUser&quot;</span><span class="p">)</span>
+<span class="n">Newsletter</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;news_app&quot;</span><span class="p">,</span> <span class="s2">&quot;Newsletter&quot;</span><span class="p">)</span>
+<span class="n">Publisher</span> <span class="o">=</span> <span class="n">apps</span><span class="o">.</span><span class="n">get_model</span><span class="p">(</span><span class="s2">&quot;news_app&quot;</span><span class="p">,</span> <span class="s2">&quot;Publisher&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="create_test_users">
+<a class="viewcode-back" href="../../../../news_app.management.commands.html#news_app.management.commands.setup_data.create_test_users">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_test_users</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create test users for each role.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Creating test users...&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create Reader</span>
+    <span class="n">reader</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;reader1&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;reader@test.com&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;reader&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;first_name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;last_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Reader&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="n">reader</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testpass123&quot;</span><span class="p">)</span>
+        <span class="n">reader</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created reader: </span><span class="si">{</span><span class="n">reader</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create Editor</span>
+    <span class="n">editor</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;editor1&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;editor@test.com&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;editor&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;first_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Jane&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;last_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Editor&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="n">editor</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testpass123&quot;</span><span class="p">)</span>
+        <span class="n">editor</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created editor: </span><span class="si">{</span><span class="n">editor</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Create Journalists</span>
+    <span class="n">journalist1</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;journalist1&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;journalist1@test.com&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;journalist&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;first_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Alice&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;last_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Reporter&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="n">journalist1</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testpass123&quot;</span><span class="p">)</span>
+        <span class="n">journalist1</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created journalist: </span><span class="si">{</span><span class="n">journalist1</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">journalist2</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">CustomUser</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">username</span><span class="o">=</span><span class="s2">&quot;journalist2&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;email&quot;</span><span class="p">:</span> <span class="s2">&quot;journalist2@test.com&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;role&quot;</span><span class="p">:</span> <span class="s2">&quot;journalist&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;first_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;last_name&quot;</span><span class="p">:</span> <span class="s2">&quot;Writer&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="n">journalist2</span><span class="o">.</span><span class="n">set_password</span><span class="p">(</span><span class="s2">&quot;testpass123&quot;</span><span class="p">)</span>
+        <span class="n">journalist2</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created journalist: </span><span class="si">{</span><span class="n">journalist2</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">reader</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">journalist1</span><span class="p">,</span> <span class="n">journalist2</span></div>
+
+
+
+<div class="viewcode-block" id="create_publishers">
+<a class="viewcode-back" href="../../../../news_app.management.commands.html#news_app.management.commands.setup_data.create_publishers">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_publishers</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create test publishers.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Creating publishers...&quot;</span><span class="p">)</span>
+
+    <span class="n">publisher1</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Tech News Daily&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;Your source for technology news&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;website&quot;</span><span class="p">:</span> <span class="s2">&quot;https://technewsdaily.com&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created publisher: </span><span class="si">{</span><span class="n">publisher1</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">publisher2</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Publisher</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Global Times&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;International news and analysis&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;website&quot;</span><span class="p">:</span> <span class="s2">&quot;https://globaltimes.com&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created publisher: </span><span class="si">{</span><span class="n">publisher2</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">publisher1</span><span class="p">,</span> <span class="n">publisher2</span></div>
+
+
+
+<div class="viewcode-block" id="create_articles">
+<a class="viewcode-back" href="../../../../news_app.management.commands.html#news_app.management.commands.setup_data.create_articles">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_articles</span><span class="p">(</span><span class="n">editor</span><span class="p">,</span> <span class="n">journalist1</span><span class="p">,</span> <span class="n">journalist2</span><span class="p">,</span> <span class="n">publisher1</span><span class="p">,</span> <span class="n">publisher2</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create sample articles.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Creating articles...&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Approved articles</span>
+    <span class="n">article1</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Introduction to Django REST Framework&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;Django REST Framework is a powerful toolkit for</span>
+<span class="s2">            building Web APIs. In this article, we&#39;ll explore its core</span>
+<span class="s2">            features and best practices.</span>
+
+<span class="s2">            Key Features:</span>
+<span class="s2">            - Serialization</span>
+<span class="s2">            - Authentication</span>
+<span class="s2">            - ViewSets and Routers</span>
+<span class="s2">            - Comprehensive testing support</span>
+
+<span class="s2">            Stay tuned for more in-depth tutorials!&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="s2">&quot;Learn the basics of Django REST Framework&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">journalist1</span><span class="p">,</span>
+            <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher1</span><span class="p">,</span>
+            <span class="s2">&quot;is_approved&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;approved_by&quot;</span><span class="p">:</span> <span class="n">editor</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created article: </span><span class="si">{</span><span class="n">article1</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">article2</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;The Future of Web Development&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;Web development continues to evolve at a rapid</span>
+<span class="s2">            pace. From serverless architectures to progressive web apps,</span>
+<span class="s2">            the landscape is constantly changing.</span>
+
+<span class="s2">            Trends to Watch:</span>
+<span class="s2">            - Edge computing</span>
+<span class="s2">            - WebAssembly</span>
+<span class="s2">            - AI-powered development tools</span>
+<span class="s2">            - Low-code platforms</span>
+
+<span class="s2">            The future looks exciting!&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="s2">&quot;Exploring upcoming trends in web development&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">journalist2</span><span class="p">,</span>
+            <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher2</span><span class="p">,</span>
+            <span class="s2">&quot;is_approved&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="s2">&quot;approved_by&quot;</span><span class="p">:</span> <span class="n">editor</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created article: </span><span class="si">{</span><span class="n">article2</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Pending article</span>
+    <span class="n">article3</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Article</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Database Optimization Techniques&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;Optimizing database queries is crucial for</span>
+<span class="s2">            application performance. This article covers various techniques</span>
+<span class="s2">            to improve query efficiency.</span>
+
+<span class="s2">            Techniques Covered:</span>
+<span class="s2">            - Index optimization</span>
+<span class="s2">            - Query analysis</span>
+<span class="s2">            - Caching strategies</span>
+<span class="s2">            - Connection pooling</span>
+
+<span class="s2">            Implementation examples included!&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;summary&quot;</span><span class="p">:</span> <span class="s2">&quot;Master database optimization for better performance&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">journalist1</span><span class="p">,</span>
+            <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher1</span><span class="p">,</span>
+            <span class="s2">&quot;is_approved&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created pending article: </span><span class="si">{</span><span class="n">article3</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_subscriptions">
+<a class="viewcode-back" href="../../../../news_app.management.commands.html#news_app.management.commands.setup_data.create_subscriptions">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_subscriptions</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">journalist1</span><span class="p">,</span> <span class="n">publisher1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Set up subscriptions.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Setting up subscriptions...&quot;</span><span class="p">)</span>
+
+    <span class="n">reader</span><span class="o">.</span><span class="n">subscribed_publishers</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">publisher1</span><span class="p">)</span>
+    <span class="n">reader</span><span class="o">.</span><span class="n">subscribed_journalists</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">journalist1</span><span class="p">)</span>
+    <span class="n">reader</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Reader subscribed to Tech News Daily&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✓ Reader subscribed to journalist1&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="create_newsletters">
+<a class="viewcode-back" href="../../../../news_app.management.commands.html#news_app.management.commands.setup_data.create_newsletters">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">create_newsletters</span><span class="p">(</span><span class="n">journalist1</span><span class="p">,</span> <span class="n">journalist2</span><span class="p">,</span> <span class="n">publisher1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create sample newsletters.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Creating newsletters...&quot;</span><span class="p">)</span>
+
+    <span class="n">newsletter1</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Weekly Tech Roundup - Week 1&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;Welcome to our weekly tech roundup!</span>
+
+<span class="s2">            This Week&#39;s Highlights:</span>
+<span class="s2">            - New framework releases</span>
+<span class="s2">            - Industry conferences</span>
+<span class="s2">            - Open source updates</span>
+<span class="s2">            - Community news</span>
+
+<span class="s2">            Thanks for reading!&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">journalist1</span><span class="p">,</span>
+            <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="n">publisher1</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created newsletter: </span><span class="si">{</span><span class="n">newsletter1</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">newsletter2</span><span class="p">,</span> <span class="n">created</span> <span class="o">=</span> <span class="n">Newsletter</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get_or_create</span><span class="p">(</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">&quot;Independent Newsletter - Django Tips&quot;</span><span class="p">,</span>
+        <span class="n">defaults</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;content&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;&quot;Quick Django tips for developers:</span>
+
+<span class="s2">            1. Use select_related for foreign keys</span>
+<span class="s2">            2. Leverage prefetch_related for many-to-many</span>
+<span class="s2">            3. Enable database query logging in development</span>
+<span class="s2">            4. Use Django Debug Toolbar</span>
+<span class="s2">            5. Write comprehensive tests</span>
+
+<span class="s2">            Happy coding!&quot;&quot;&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;author&quot;</span><span class="p">:</span> <span class="n">journalist2</span><span class="p">,</span>
+            <span class="s2">&quot;publisher&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">created</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created newsletter: </span><span class="si">{</span><span class="n">newsletter2</span><span class="o">.</span><span class="n">title</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="main">
+<a class="viewcode-back" href="../../../../news_app.management.commands.html#news_app.management.commands.setup_data.main">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Main setup function.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;News Application - Data Setup&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Create users</span>
+        <span class="n">reader</span><span class="p">,</span> <span class="n">editor</span><span class="p">,</span> <span class="n">journalist1</span><span class="p">,</span> <span class="n">journalist2</span> <span class="o">=</span> <span class="n">create_test_users</span><span class="p">()</span>
+
+        <span class="c1"># Create publishers</span>
+        <span class="n">publisher1</span><span class="p">,</span> <span class="n">publisher2</span> <span class="o">=</span> <span class="n">create_publishers</span><span class="p">()</span>
+
+        <span class="c1"># Create articles</span>
+        <span class="n">create_articles</span><span class="p">(</span><span class="n">editor</span><span class="p">,</span>
+                        <span class="n">journalist1</span><span class="p">,</span>
+                        <span class="n">journalist2</span><span class="p">,</span>
+                        <span class="n">publisher1</span><span class="p">,</span>
+                        <span class="n">publisher2</span><span class="p">)</span>
+
+        <span class="c1"># Set up subscriptions</span>
+        <span class="n">create_subscriptions</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">journalist1</span><span class="p">,</span> <span class="n">publisher1</span><span class="p">)</span>
+
+        <span class="c1"># Create newsletters</span>
+        <span class="n">create_newsletters</span><span class="p">(</span><span class="n">journalist1</span><span class="p">,</span> <span class="n">journalist2</span><span class="p">,</span> <span class="n">publisher1</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Setup completed successfully!&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Test User Credentials:&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Reader:     username=reader1,     password=testpass123&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Editor:     username=editor1,     password=testpass123&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Journalist: username=journalist1, password=testpass123&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Journalist: username=journalist2, password=testpass123&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">✗ Error during setup: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span></div>
+
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tshidiso Tsatsi.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
