@@ -23,15 +23,6 @@ A comprehensive news publishing platform with role-based access control, article
 - **Testing**: Django TestCase & pytest
 - **API Documentation**: Comprehensive markdown docs with examples
 
-## 📚 Documentation
-
-### API Documentation Files
-
-Complete, production-ready API documentation is included:
-
-- **[API_DOCUMENTATION.md](./docs/API_DOCUMENTATION.md)** - Complete API reference with all endpoints
-- **[API_QUICK_REFERENCE.md](./docs/API_QUICK_REFERENCE.md)** - Quick lookup tables and examples
-- **[TOKEN_AUTHENTICATION_API.md](./docs/TOKEN_AUTHENTICATION_API.md)** - Authentication guide for API users
 
 ## 🚀 Quick Start
 
